@@ -1,5 +1,5 @@
-import "../assets/scss/globals.scss";
-import "../assets/scss/theme.scss";
+import "./assets/scss/globals.scss";
+import "./assets/scss/theme.scss";
 import { Inter } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import Providers from "@/provider/providers";

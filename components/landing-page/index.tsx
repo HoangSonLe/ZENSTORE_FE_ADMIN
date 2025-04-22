@@ -23,7 +23,6 @@ const LandingPageView = () => {
   }
   return (
     <div className="bg-background">
-      <Header />
       <Hero />
       <Stats />
       <AllComponents />
