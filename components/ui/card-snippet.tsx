@@ -12,7 +12,8 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import type { SyntaxHighlighterProps } from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { themes } from "@/config/thems";
 import { useTheme } from "next-themes";
@@ -54,17 +55,23 @@ const CardSnippet = ({ title, code, children }: CardSnippetProps) => {
                 {children}
                 <Collapsible open={show}>
                     <CollapsibleContent className="CollapsibleContent">
-                        <SyntaxHighlighter
-                            language="javascript"
-                            className="rounded-md text-sm mt-6"
-                            style={atomOneDark}
-                            customStyle={{
-                                padding: "24px",
-                                backgroundColor: mode !== "dark" ? hexPrimary : hexPrimary2,
-                            }}
-                        >
-                            {`${code}`}
-                        </SyntaxHighlighter>
+                        {code && (
+                            <Collapsible open={show}>
+                                <CollapsibleContent className="CollapsibleContent">
+                                    {React.createElement(SyntaxHighlighter as any, {
+                                        language: "javascript",
+                                        className: "rounded-md text-sm mt-6",
+                                        style: atomOneDark,
+                                        customStyle: {
+                                            padding: "24px",
+                                            backgroundColor:
+                                                mode !== "dark" ? hexPrimary : hexPrimary2,
+                                        },
+                                        children: `${code}`,
+                                    })}
+                                </CollapsibleContent>
+                            </Collapsible>
+                        )}
                     </CollapsibleContent>
                 </Collapsible>
             </CardContent>
