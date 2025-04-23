@@ -1,6 +1,6 @@
 "use client";
-import AdvancedTable from "@/components/table/advanced";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ProductTable from "./ProductTable";
 
 const DataTablePage = () => {
     return (
@@ -10,7 +10,7 @@ const DataTablePage = () => {
                     <CardTitle>Sản phẩm</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <AdvancedTable />
+                    <ProductTable />
                 </CardContent>
             </Card>
         </div>
