@@ -16,6 +16,8 @@ A simplified TinyMCE-based rich text editor component that works without requiri
 -   Customizable height
 -   Responsive design with sliding toolbar for small screens
 -   Mobile-friendly interface with scrolling toolbar
+-   Enhanced resize handle for easy editor resizing
+-   Improved resize handle visibility and usability
 -   Sticky toolbar that remains visible when scrolling
 -   Resizable editor with minimum and maximum height constraints
 -   Suppresses premium feature notifications
@@ -50,7 +52,16 @@ This component uses TinyMCE but is configured to:
 2. Include only the basic plugins that don't require premium features
 3. Suppress notifications about premium features or API key requirements
 
-The component includes code to intercept and hide any notifications about API keys or premium features, allowing you to use TinyMCE without those distractions.
+### Resize Handle Feature
+
+The component includes an enhanced resize handle that allows users to adjust the height of the editor:
+
+1. The resize handle is located in the bottom-right corner of the editor
+2. Users can click and drag this handle to resize the editor vertically and horizontally
+3. The resize handle has been styled to be more visible and easier to use
+4. The editor maintains minimum and maximum height constraints to ensure usability
+
+The component also includes code to intercept and hide any notifications about API keys or premium features, allowing you to use TinyMCE without those distractions.
 
 ## Example Implementation
 

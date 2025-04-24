@@ -18,8 +18,8 @@ import {
     BadgeColor,
 } from "@/components/table/cell-renderers";
 // Action buttons are now imported directly
-import ProductUpdateForm from "./components/product-update-form";
-import ProductCreateForm from "./components/product-create-form";
+import UpdateProductDetail from "./components/update-product-detail";
+import CreateProductDetail from "./components/create-product-detail";
 import { toast } from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -101,63 +101,23 @@ export default function ProductTable() {
         }
     };
 
-    // Handler for updating a product
-    const handleUpdateProduct = async (updatedProduct: IProduct) => {
-        try {
-            // In a real application, you would call an API to update the product
-            // For now, we'll just simulate a successful update
-            console.log("Updating product:", updatedProduct);
-
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 500));
-
-            // Trigger a refresh of the table data
-            setRefreshTrigger((prev) => prev + 1);
-
-            toast.success("Product updated successfully");
-        } catch (error) {
-            console.error("Error updating product:", error);
-            toast.error("Failed to update product");
-            throw error;
-        }
-    };
-
     // Handler for deleting a product
     const handleDeleteProduct = async (product: IProduct) => {
         try {
-            // In a real application, you would call an API to delete the product
-            // For now, we'll just simulate a successful deletion
             console.log("Deleting product:", product);
 
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            // Call the API to delete the product
+            await productApi.deleteProductById({
+                params: { productId: product.productId },
+            });
 
             // Trigger a refresh of the table data
             setRefreshTrigger((prev) => prev + 1);
+
+            toast.success("Product deleted successfully");
         } catch (error) {
             console.error("Error deleting product:", error);
             toast.error("Failed to delete product");
-            throw error;
-        }
-    };
-
-    // Handler for creating a product
-    const handleCreateProduct = async (newProduct: Partial<IProduct>) => {
-        try {
-            // In a real application, you would call an API to create the product
-            // For now, we'll just simulate a successful creation
-            console.log("Creating product:", newProduct);
-
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 500));
-
-            // Trigger a refresh of the table data
-            setRefreshTrigger((prev) => prev + 1);
-
-            toast.success("Product created successfully");
-        } catch (error) {
-            console.error("Error creating product:", error);
-            toast.error("Failed to create product");
             throw error;
         }
     };
@@ -264,10 +224,10 @@ export default function ProductTable() {
                 <ActionButtons
                     row={row.original}
                     renderUpdateForm={(product, onClose) => (
-                        <ProductUpdateForm
+                        <UpdateProductDetail
                             product={product}
                             onClose={onClose}
-                            onUpdate={handleUpdateProduct}
+                            onSuccess={() => setRefreshTrigger((prev) => prev + 1)}
                         />
                     )}
                     onDelete={handleDeleteProduct}
@@ -304,7 +264,7 @@ export default function ProductTable() {
     const filterMapping = {
         status: "statusCode",
         space: "spaceCode",
-        series: "seriesCode",
+        series: "seriCode",
         color: "colorCode",
     };
 
@@ -327,9 +287,9 @@ export default function ProductTable() {
                     <DialogHeader>
                         <DialogTitle>Create New Product</DialogTitle>
                     </DialogHeader>
-                    <ProductCreateForm
+                    <CreateProductDetail
                         onClose={() => setIsCreateDialogOpen(false)}
-                        onCreate={handleCreateProduct}
+                        onSuccess={() => setRefreshTrigger((prev) => prev + 1)}
                     />
                 </DialogContent>
             </Dialog>

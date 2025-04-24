@@ -20,32 +20,56 @@ import CKEditor from "@/components/ui/CKEditor/CKEditor";
 import ProductFileUploader from "./product-file-uploader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-interface ProductUpdateFormProps {
-    product: IProduct;
-    onClose: () => void;
-    onUpdate?: (updatedProduct: IProduct) => Promise<void>;
-}
-
 interface FileWithPreview extends File {
     preview: string;
 }
 
-export default function ProductUpdateForm({ product, onClose, onUpdate }: ProductUpdateFormProps) {
-    const [formData, setFormData] = useState<Partial<IProduct>>({
-        productName: product.productName || "",
-        productPrice: product.productPrice || 0,
-        productPriceSale: product.productPriceSale || 0,
-        productStatusCode: product.productStatusCode || "",
-        spaceCode: product.spaceCode || "",
-        seriesCode: product.seriesCode || "",
-        colorCode: product.colorCode || "",
-        productShortDetail: product.productShortDetail || "",
-        productDetail: product.productDetail || "",
-    });
+export interface ProductDetailProps {
+    initialData?: Partial<IProduct>;
+    onClose: () => void;
+    onSubmit: (productData: Partial<IProduct>) => Promise<void>;
+    submitButtonText: string;
+    loadingText: string;
+}
+
+export default function ProductDetail({
+    initialData = {
+        productName: "",
+        productPrice: 0,
+        productPriceSale: 0,
+        productStatusCode: "",
+        productSpaceCode: "",
+        productSeriesCode: "",
+        productColorCode: "",
+        productShortDetail: "",
+        productDetail: "",
+    },
+    onClose,
+    onSubmit,
+    submitButtonText,
+    loadingText,
+}: ProductDetailProps) {
+    const [formData, setFormData] = useState<Partial<IProduct>>(initialData);
     const [productImages, setProductImages] = useState<FileWithPreview[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [showValidationError, setShowValidationError] = useState(false);
+
+    // Load images from initialData if available
+    useEffect(() => {
+        if (initialData.listImage && initialData.listImage.length > 0) {
+            const imageFiles = initialData.listImage.map((url, index) => {
+                const fileName = url.split("/").pop() || `image-${index}.jpg`;
+                return {
+                    name: fileName,
+                    size: 0,
+                    type: "image/jpeg",
+                    preview: url,
+                } as FileWithPreview;
+            });
+            setProductImages(imageFiles);
+        }
+    }, [initialData.listImage]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -71,6 +95,13 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
 
     const handleImagesChange = (files: FileWithPreview[]) => {
         setProductImages(files);
+
+        // Convert images to base64 or URLs for API submission
+        const imageUrls = files.map((file) => file.preview);
+        setFormData((prev) => ({
+            ...prev,
+            listImage: imageUrls,
+        }));
     };
 
     // Validate form data
@@ -90,16 +121,16 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
             newErrors.productStatusCode = "Status is required";
         }
 
-        if (!formData.spaceCode) {
-            newErrors.spaceCode = "Space is required";
+        if (!formData.productSpaceCode) {
+            newErrors.productSpaceCode = "Space is required";
         }
 
-        if (!formData.seriesCode) {
-            newErrors.seriesCode = "Series is required";
+        if (!formData.productSeriesCode) {
+            newErrors.productSeriesCode = "Series is required";
         }
 
-        if (!formData.colorCode) {
-            newErrors.colorCode = "Color is required";
+        if (!formData.productColorCode) {
+            newErrors.productColorCode = "Color is required";
         }
 
         if (!formData.productShortDetail?.trim()) {
@@ -108,6 +139,11 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
 
         if (!formData.productDetail?.trim()) {
             newErrors.productDetail = "Full description is required";
+        }
+
+        // Validate product images
+        if (!formData.listImage || formData.listImage.length === 0) {
+            newErrors.listImage = "At least one product image is required";
         }
 
         setErrors(newErrors);
@@ -126,38 +162,37 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
         setIsLoading(true);
 
         try {
-            if (onUpdate) {
-                const updatedProduct = {
-                    ...product,
-                    ...formData,
-                };
-                await onUpdate(updatedProduct);
-            }
-            toast.success("Product updated successfully");
+            await onSubmit(formData);
             onClose();
         } catch (error) {
-            console.error("Error updating product:", error);
-            toast.error("Failed to update product");
+            console.error("Error submitting product:", error);
+            toast.error("Failed to save product");
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Mock data for dropdowns
-    const spaceOptions = ["SPACE_1", "SPACE_2", "SPACE_3"].map((space) => ({
-        label: space.replace("_", " "),
-        value: space,
-    }));
+    // Data for dropdowns
+    const spaceOptions = [
+        { value: "LIVING", label: "Living Room" },
+        { value: "BEDROOM", label: "Bedroom" },
+        { value: "KITCHEN", label: "Kitchen" },
+        { value: "BATHROOM", label: "Bathroom" },
+    ];
 
-    const seriesOptions = ["SERIES_1", "SERIES_2", "SERIES_3"].map((series) => ({
-        label: series.replace("_", " "),
-        value: series,
-    }));
+    const seriesOptions = [
+        { value: "MODERN", label: "Modern" },
+        { value: "CLASSIC", label: "Classic" },
+        { value: "VINTAGE", label: "Vintage" },
+        { value: "MINIMALIST", label: "Minimalist" },
+    ];
 
-    const colorOptions = ["COLOR_RED", "COLOR_BLUE", "COLOR_GREEN"].map((color) => ({
-        label: color.replace("COLOR_", ""),
-        value: color,
-    }));
+    const colorOptions = [
+        { value: "BLACK", label: "Black" },
+        { value: "WHITE", label: "White" },
+        { value: "BROWN", label: "Brown" },
+        { value: "GRAY", label: "Gray" },
+    ];
 
     // Clear validation error when any field changes
     useEffect(() => {
@@ -169,7 +204,7 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
     return (
         <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[85vh]">
             {showValidationError && Object.keys(errors).length > 0 && (
-                <Alert variant="destructive" className="mb-4">
+                <Alert className="mb-4 bg-destructive/15 text-destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
                         Please fix the validation errors before submitting the form.
@@ -259,14 +294,16 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
 
                     {/* Space - span 1 column */}
                     <div className="space-y-2">
-                        <Label htmlFor="spaceCode" className="flex items-center gap-1">
+                        <Label htmlFor="productSpaceCode" className="flex items-center gap-1">
                             Space <span className="text-destructive">*</span>
                         </Label>
                         <Select
-                            value={formData.spaceCode as string}
-                            onValueChange={(value) => handleSelectChange("spaceCode", value)}
+                            value={formData.productSpaceCode as string}
+                            onValueChange={(value) => handleSelectChange("productSpaceCode", value)}
                         >
-                            <SelectTrigger className={errors.spaceCode ? "border-destructive" : ""}>
+                            <SelectTrigger
+                                className={errors.productSpaceCode ? "border-destructive" : ""}
+                            >
                                 <SelectValue placeholder="Select space" />
                             </SelectTrigger>
                             <SelectContent>
@@ -277,22 +314,26 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
                                 ))}
                             </SelectContent>
                         </Select>
-                        {errors.spaceCode && (
-                            <p className="text-xs text-destructive mt-1">{errors.spaceCode}</p>
+                        {errors.productSpaceCode && (
+                            <p className="text-xs text-destructive mt-1">
+                                {errors.productSpaceCode}
+                            </p>
                         )}
                     </div>
 
                     {/* Series - span 1 column */}
                     <div className="space-y-2">
-                        <Label htmlFor="seriesCode" className="flex items-center gap-1">
+                        <Label htmlFor="productSeriesCode" className="flex items-center gap-1">
                             Series <span className="text-destructive">*</span>
                         </Label>
                         <Select
-                            value={formData.seriesCode as string}
-                            onValueChange={(value) => handleSelectChange("seriesCode", value)}
+                            value={formData.productSeriesCode as string}
+                            onValueChange={(value) =>
+                                handleSelectChange("productSeriesCode", value)
+                            }
                         >
                             <SelectTrigger
-                                className={errors.seriesCode ? "border-destructive" : ""}
+                                className={errors.productSeriesCode ? "border-destructive" : ""}
                             >
                                 <SelectValue placeholder="Select series" />
                             </SelectTrigger>
@@ -304,21 +345,25 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
                                 ))}
                             </SelectContent>
                         </Select>
-                        {errors.seriesCode && (
-                            <p className="text-xs text-destructive mt-1">{errors.seriesCode}</p>
+                        {errors.productSeriesCode && (
+                            <p className="text-xs text-destructive mt-1">
+                                {errors.productSeriesCode}
+                            </p>
                         )}
                     </div>
 
                     {/* Color - span 1 column */}
                     <div className="space-y-2">
-                        <Label htmlFor="colorCode" className="flex items-center gap-1">
+                        <Label htmlFor="productColorCode" className="flex items-center gap-1">
                             Color <span className="text-destructive">*</span>
                         </Label>
                         <Select
-                            value={formData.colorCode as string}
-                            onValueChange={(value) => handleSelectChange("colorCode", value)}
+                            value={formData.productColorCode as string}
+                            onValueChange={(value) => handleSelectChange("productColorCode", value)}
                         >
-                            <SelectTrigger className={errors.colorCode ? "border-destructive" : ""}>
+                            <SelectTrigger
+                                className={errors.productColorCode ? "border-destructive" : ""}
+                            >
                                 <SelectValue placeholder="Select color" />
                             </SelectTrigger>
                             <SelectContent>
@@ -329,8 +374,10 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
                                 ))}
                             </SelectContent>
                         </Select>
-                        {errors.colorCode && (
-                            <p className="text-xs text-destructive mt-1">{errors.colorCode}</p>
+                        {errors.productColorCode && (
+                            <p className="text-xs text-destructive mt-1">
+                                {errors.productColorCode}
+                            </p>
                         )}
                     </div>
                 </div>
@@ -377,8 +424,15 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
 
                 {/* Product Images - span 2 columns */}
                 <div className="space-y-2 col-span-full">
-                    <Label htmlFor="productImages">Product Images (Max 5)</Label>
-                    <ProductFileUploader value={productImages} onChange={handleImagesChange} />
+                    <Label htmlFor="productImages" className="flex items-center gap-1">
+                        Product Images (Max 5) <span className="text-destructive">*</span>
+                    </Label>
+                    <div className={errors.listImage ? "border border-destructive rounded" : ""}>
+                        <ProductFileUploader value={productImages} onChange={handleImagesChange} />
+                    </div>
+                    {errors.listImage && (
+                        <p className="text-xs text-destructive mt-1">{errors.listImage}</p>
+                    )}
                 </div>
             </div>
 
@@ -388,7 +442,7 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
                 </Button>
                 <Button type="submit" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isLoading ? "Saving..." : "Save changes"}
+                    {isLoading ? loadingText : submitButtonText}
                 </Button>
             </DialogFooter>
         </form>

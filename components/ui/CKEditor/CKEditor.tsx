@@ -18,11 +18,64 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
     ({ initialValue, height, onChange }, ref) => {
         const [isMounted, setIsMounted] = useState(false);
         const editorRef = useRef<any>(null);
+        const [value, setValue] = useState(initialValue || "");
+        const isUpdatingRef = useRef(false);
 
         // Only render the editor on the client-side
         useEffect(() => {
             setIsMounted(true);
         }, []);
+
+        // Add custom CSS to fix z-index issues and improve styling
+        // useEffect(() => {
+        //     // Add custom CSS to the document head
+        //     const style = document.createElement("style");
+        //     style.innerHTML = `
+        //         /* Make the statusbar more visible */
+        //         .tox-statusbar {
+        //             border-top: 1px solid #ccc !important;
+        //             background-color: #f8f8f8 !important;
+        //             height: 25px !important;
+        //         }
+        //         /* Fix z-index for preview and other popups */
+        //         .tox-dialog-wrap {
+        //             z-index: 10000 !important;
+        //         }
+        //         .tox-dialog {
+        //             z-index: 10001 !important;
+        //         }
+        //         .tox-dialog__backdrop {
+        //             z-index: 10000 !important;
+        //         }
+        //         .tox-menu {
+        //             z-index: 10002 !important;
+        //         }
+        //         .tox-collection--toolbar {
+        //             z-index: 10002 !important;
+        //         }
+        //         .tox-selected-menu {
+        //             z-index: 10003 !important;
+        //         }
+        //         .tox-collection--list {
+        //             z-index: 10002 !important;
+        //         }
+        //         .tox-tooltip {
+        //             z-index: 10003 !important;
+        //         }
+        //         .tox-pop {
+        //             z-index: 10002 !important;
+        //         }
+        //         .tox-silver-sink {
+        //             z-index: 10000 !important;
+        //         }
+        //     `;
+        //     document.head.appendChild(style);
+
+        //     // Clean up the style when component unmounts
+        //     return () => {
+        //         document.head.removeChild(style);
+        //     };
+        // }, []);
 
         // Expose methods to parent using useImperativeHandle
         useImperativeHandle(ref, () => ({
@@ -31,40 +84,38 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
             },
         }));
 
+        // Handle content change internally first
+        const handleEditorChange = (content: string) => {
+            // Update internal state
+            setValue(content);
+
+            // Notify parent component
+            onChange(content);
+        };
+
         // Responsive toolbar configuration
         const toolbar = [
-            {
-                name: "formatting",
-                items: ["bold", "italic", "underline", "strikethrough"],
-            },
-            {
-                name: "alignment",
-                items: ["alignleft", "aligncenter", "alignright", "alignjustify"],
-            },
-            {
-                name: "lists",
-                items: ["bullist", "numlist"],
-            },
-            {
-                name: "indentation",
-                items: ["outdent", "indent"],
-            },
-            {
-                name: "insert",
-                items: ["link", "image", "table", "media"],
-            },
-            {
-                name: "view",
-                items: ["fullscreen", "preview"],
-            },
-            {
-                name: "tools",
-                items: ["removeformat"],
-            },
+            "bold italic underline | alignleft aligncenter alignright | bullist numlist | link image",
+            "table media | fullscreen preview | removeformat",
         ];
 
         // Plugins including image support
-        const plugins = ["lists", "link", "image", "table", "fullscreen"];
+        const plugins = [
+            "advlist",
+            "autolink",
+            "lists",
+            "link",
+            "image",
+            "charmap",
+            // "preview",
+            "anchor",
+            "searchreplace",
+            "visualblocks",
+            "media",
+            "table",
+            "fullscreen",
+            "wordcount",
+        ];
 
         // Return a placeholder until the component is mounted
         if (!isMounted) {
@@ -82,10 +133,10 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
             <div className="tinymce-wrapper">
                 {isMounted && (
                     <Editor
+                        value={value}
                         onInit={(_evt: any, editor: any) => {
                             editorRef.current = editor;
                         }}
-                        initialValue={initialValue}
                         init={{
                             height: height ?? 300,
                             menubar: false,
@@ -95,6 +146,7 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
                             toolbar_sticky: true, // Keep toolbar visible when scrolling
                             toolbar_location: "top", // Position toolbar at the top
                             resize: true, // Allow resizing
+                            resize_img_proportional: true, // Keep image proportions when resizing
                             min_height: 200, // Set minimum height
                             max_height: 800, // Set maximum height
                             mobile: {
@@ -105,7 +157,7 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
                                 "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
                             branding: false,
                             promotion: false,
-                            statusbar: false,
+                            statusbar: true, // Show statusbar with resize handle
                             // File picker for images and media
                             file_picker_types: "file image media",
                             file_picker_callback: (cb: any, _value: any, meta: any) => {
@@ -174,7 +226,7 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
                                 });
                             },
                         }}
-                        onEditorChange={onChange}
+                        onEditorChange={handleEditorChange}
                     />
                 )}
             </div>

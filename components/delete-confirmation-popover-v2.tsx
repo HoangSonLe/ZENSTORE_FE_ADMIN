@@ -90,7 +90,7 @@ const DeleteConfirmationPopoverV2: React.FC<DeleteConfirmationPopoverProps> = ({
                         type="button"
                     >
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
+                        <span className="sr-only">Xóa</span>
                     </Button>
                 )}
             </div>
@@ -104,9 +104,9 @@ const DeleteConfirmationPopoverV2: React.FC<DeleteConfirmationPopoverProps> = ({
                     onMouseDown={(e) => e.stopPropagation()} // Prevent dropdown from closing
                 >
                     <div className="p-3 pb-0">
-                        <div className="font-medium">Delete Confirmation</div>
+                        <div className="font-medium">Xác nhận xóa</div>
                         <div className="text-xs text-muted-foreground mt-1">
-                            Are you sure you want to delete this item? This action cannot be undone.
+                            Bạn có chắc chắn xóa sản phẩm này?
                         </div>
                     </div>
                     <div className="flex items-center justify-end p-3 pt-2">
@@ -117,7 +117,7 @@ const DeleteConfirmationPopoverV2: React.FC<DeleteConfirmationPopoverProps> = ({
                             className="mr-2 h-7 px-2 text-xs"
                             onClick={() => setIsOpen(false)}
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button
                             variant="soft"
@@ -128,7 +128,7 @@ const DeleteConfirmationPopoverV2: React.FC<DeleteConfirmationPopoverProps> = ({
                             className={`h-7 px-2 text-xs ${isPending ? "pointer-events-none" : ""}`}
                         >
                             {isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
-                            {isPending ? "Deleting..." : "OK"}
+                            {isPending ? "Đang xóa..." : "Chấp nhận"}
                         </Button>
                     </div>
                 </div>

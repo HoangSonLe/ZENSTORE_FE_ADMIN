@@ -17,7 +17,7 @@ export default {
     createOrUpdateProductDetail(
         params: IApiRequestParams<null, IProduct, null>
     ): Promise<IApiResponse<IProduct>> {
-        return apiService({ url: "/Product/CreateorUpdate", ...params });
+        return apiService({ method: "POST", url: "/Product/CreateorUpdate", ...params });
     },
     deleteProductById(
         params: IApiRequestParams<null, { productId: number }, null>
