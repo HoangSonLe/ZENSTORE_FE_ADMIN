@@ -16,7 +16,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { EProductStatus } from "@/constants/enum";
-import CKEditor from "@/components/ui/CKEditor/CKEditor";
+import ClientSideCustomEditor from "@/components/ui/CKEditor/TinyMCE/ClientSideCustomEditor";
 import ProductFileUploader from "./product-file-uploader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -392,7 +392,7 @@ export default function ProductDetail({
                             errors.productShortDetail ? "border border-destructive rounded" : ""
                         }
                     >
-                        <CKEditor
+                        <ClientSideCustomEditor
                             initialValue={formData.productShortDetail as string}
                             onChange={(value) => handleEditorChange("productShortDetail", value)}
                             height="200px"
@@ -411,7 +411,7 @@ export default function ProductDetail({
                     <div
                         className={errors.productDetail ? "border border-destructive rounded" : ""}
                     >
-                        <CKEditor
+                        <ClientSideCustomEditor
                             initialValue={formData.productDetail as string}
                             onChange={(value) => handleEditorChange("productDetail", value)}
                             height="350px"

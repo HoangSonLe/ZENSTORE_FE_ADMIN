@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import ClientSideCustomEditor from "@/components/ui/CKEditor/TinyMCE/ClientSideCustomEditor";
+import ClientSideCustomEditor from "@/components/ui/CKEditor/CKEditor5/ClientSideCustomEditor";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export default function CKEditorTestPage() {
-    const [content, setContent] = useState("<p>Test content in CKEditor</p>");
+export default function CKEditor5TestPage() {
+    const [content, setContent] = useState("<p>Test content in CKEditor 5</p>");
     const [displayContent, setDisplayContent] = useState("");
 
     const handleEditorChange = (newContent: string) => {
@@ -21,12 +21,17 @@ export default function CKEditorTestPage() {
         <div className="container mx-auto p-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>CKEditor (No API Key Required)</CardTitle>
+                    <CardTitle>CKEditor 5 Test</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-2">
+                        Note: Font features (font family, size, color, background color) require a
+                        custom CKEditor build. See the README in components/ui/CKEditor/CKEditor5
+                        for details.
+                    </p>
                 </CardHeader>
                 <CardContent>
                     <div className="mb-6">
                         <ClientSideCustomEditor
-                            initialValue={content}
+                            initialData={content}
                             onChange={handleEditorChange}
                             height="300px"
                         />
