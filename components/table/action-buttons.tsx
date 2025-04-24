@@ -51,7 +51,7 @@ export function ActionButtons<T>({
             {/* Update Dialog */}
             {renderUpdateForm && (
                 <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-                    <DialogContent size="2xl" className="w-full max-w-[800px]">
+                    <DialogContent size="5xl" className="w-full max-w-[1200px]">
                         <DialogHeader>
                             <DialogTitle>Edit Product</DialogTitle>
                             <DialogDescription>

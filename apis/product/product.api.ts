@@ -14,4 +14,14 @@ export default {
     ): Promise<IApiResponse<IProduct>> {
         return apiService({ url: "/Product/FindById", ...params });
     },
+    createOrUpdateProductDetail(
+        params: IApiRequestParams<null, IProduct, null>
+    ): Promise<IApiResponse<IProduct>> {
+        return apiService({ url: "/Product/CreateorUpdate", ...params });
+    },
+    deleteProductById(
+        params: IApiRequestParams<null, { productId: number }, null>
+    ): Promise<IApiResponse<IProduct>> {
+        return apiService({ url: "/Product/DeleteById", ...params });
+    },
 };

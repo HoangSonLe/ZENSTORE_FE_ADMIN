@@ -29,6 +29,7 @@ export default function RootLayout({
     return (
         <html lang={lang}>
             <head>
+                {/* TinyMCE with API key for CKEditor */}
                 <Script
                     src="https://cdn.tiny.cloud/1/qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc/tinymce/6/tinymce.min.js"
                     strategy="beforeInteractive"

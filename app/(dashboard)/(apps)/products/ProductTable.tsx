@@ -19,8 +19,12 @@ import {
 } from "@/components/table/cell-renderers";
 // Action buttons are now imported directly
 import ProductUpdateForm from "./components/product-update-form";
+import ProductCreateForm from "./components/product-create-form";
 import { toast } from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // Define filter options
 const statusOptions = Object.values(EProductStatus).map((status) => ({
@@ -52,6 +56,7 @@ const colorOptions = [
 // Define the ProductTable component
 export default function ProductTable() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
     // Function to fetch products from the API
     const fetchProducts = async (params: IProductQuery) => {
@@ -132,6 +137,27 @@ export default function ProductTable() {
         } catch (error) {
             console.error("Error deleting product:", error);
             toast.error("Failed to delete product");
+            throw error;
+        }
+    };
+
+    // Handler for creating a product
+    const handleCreateProduct = async (newProduct: Partial<IProduct>) => {
+        try {
+            // In a real application, you would call an API to create the product
+            // For now, we'll just simulate a successful creation
+            console.log("Creating product:", newProduct);
+
+            // Simulate API call delay
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            // Trigger a refresh of the table data
+            setRefreshTrigger((prev) => prev + 1);
+
+            toast.success("Product created successfully");
+        } catch (error) {
+            console.error("Error creating product:", error);
+            toast.error("Failed to create product");
             throw error;
         }
     };
@@ -284,6 +310,30 @@ export default function ProductTable() {
 
     return (
         <Fragment>
+            {/* Create Product Button */}
+            <div className="flex justify-end mb-4">
+                <Button
+                    onClick={() => setIsCreateDialogOpen(true)}
+                    className="flex items-center gap-2"
+                >
+                    <PlusCircle className="h-4 w-4" />
+                    Create Product
+                </Button>
+            </div>
+
+            {/* Create Product Dialog */}
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogContent size="5xl" className="w-full max-w-[1200px]">
+                    <DialogHeader>
+                        <DialogTitle>Create New Product</DialogTitle>
+                    </DialogHeader>
+                    <ProductCreateForm
+                        onClose={() => setIsCreateDialogOpen(false)}
+                        onCreate={handleCreateProduct}
+                    />
+                </DialogContent>
+            </Dialog>
+
             <CommonTable<IProduct, IProductQuery>
                 columns={columns}
                 fetchData={fetchProducts}

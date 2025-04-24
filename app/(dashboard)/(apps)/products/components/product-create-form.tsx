@@ -20,27 +20,26 @@ import CKEditor from "@/components/ui/CKEditor/CKEditor";
 import ProductFileUploader from "./product-file-uploader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-interface ProductUpdateFormProps {
-    product: IProduct;
+interface ProductCreateFormProps {
     onClose: () => void;
-    onUpdate?: (updatedProduct: IProduct) => Promise<void>;
+    onCreate?: (newProduct: Partial<IProduct>) => Promise<void>;
 }
 
 interface FileWithPreview extends File {
     preview: string;
 }
 
-export default function ProductUpdateForm({ product, onClose, onUpdate }: ProductUpdateFormProps) {
+export default function ProductCreateForm({ onClose, onCreate }: ProductCreateFormProps) {
     const [formData, setFormData] = useState<Partial<IProduct>>({
-        productName: product.productName || "",
-        productPrice: product.productPrice || 0,
-        productPriceSale: product.productPriceSale || 0,
-        productStatusCode: product.productStatusCode || "",
-        spaceCode: product.spaceCode || "",
-        seriesCode: product.seriesCode || "",
-        colorCode: product.colorCode || "",
-        productShortDetail: product.productShortDetail || "",
-        productDetail: product.productDetail || "",
+        productName: "",
+        productPrice: 0,
+        productPriceSale: 0,
+        productStatusCode: "",
+        spaceCode: "",
+        seriesCode: "",
+        colorCode: "",
+        productShortDetail: "",
+        productDetail: "",
     });
     const [productImages, setProductImages] = useState<FileWithPreview[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -126,18 +125,14 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
         setIsLoading(true);
 
         try {
-            if (onUpdate) {
-                const updatedProduct = {
-                    ...product,
-                    ...formData,
-                };
-                await onUpdate(updatedProduct);
+            if (onCreate) {
+                await onCreate(formData);
             }
-            toast.success("Product updated successfully");
+            toast.success("Product created successfully");
             onClose();
         } catch (error) {
-            console.error("Error updating product:", error);
-            toast.error("Failed to update product");
+            console.error("Error creating product:", error);
+            toast.error("Failed to create product");
         } finally {
             setIsLoading(false);
         }
@@ -388,7 +383,7 @@ export default function ProductUpdateForm({ product, onClose, onUpdate }: Produc
                 </Button>
                 <Button type="submit" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isLoading ? "Saving..." : "Save changes"}
+                    {isLoading ? "Creating..." : "Create Product"}
                 </Button>
             </DialogFooter>
         </form>
