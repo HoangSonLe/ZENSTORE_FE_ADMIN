@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 // Dialog variants for sizing
 const dialogVariants = cva(
-    "fixed left-1/2 top-1/2 z-[999] grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 bg-background p-6 shadow-lg duration-200 rounded-lg grid gap-4",
+    "fixed left-1/2 top-1/2 z-[9999] grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 bg-background p-6 shadow-lg duration-200 rounded-lg grid gap-4",
     {
         variants: {
             size: {
@@ -51,23 +51,19 @@ interface BasicDialogProps {
     onOpenChange?: (open: boolean) => void;
 }
 
-const BasicDialog: React.FC<BasicDialogProps> = ({
-    children,
-    open = false,
-    onOpenChange,
-}) => {
+const BasicDialog: React.FC<BasicDialogProps> = ({ children, open = false, onOpenChange }) => {
     const [internalOpen, setInternalOpen] = React.useState(open);
-    
+
     // Sync with external state if provided
     React.useEffect(() => {
         setInternalOpen(open);
     }, [open]);
-    
+
     const handleOpenChange = (newOpen: boolean) => {
         setInternalOpen(newOpen);
         onOpenChange?.(newOpen);
     };
-    
+
     return (
         <DialogContext.Provider value={{ open: internalOpen, setOpen: handleOpenChange }}>
             {children}
@@ -81,23 +77,20 @@ interface BasicDialogTriggerProps {
     asChild?: boolean;
 }
 
-const BasicDialogTrigger: React.FC<BasicDialogTriggerProps> = ({
-    children,
-    asChild = false,
-}) => {
+const BasicDialogTrigger: React.FC<BasicDialogTriggerProps> = ({ children, asChild = false }) => {
     const { setOpen } = useDialog();
-    
+
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
         setOpen(true);
     };
-    
+
     if (asChild) {
         return React.cloneElement(children as React.ReactElement, {
             onClick: handleClick,
         });
     }
-    
+
     return (
         <button type="button" onClick={handleClick}>
             {children}
@@ -116,7 +109,7 @@ interface BasicDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const BasicDialogContent = React.forwardRef<HTMLDivElement, BasicDialogContentProps>(
     ({ children, className, size, overlayClass, hiddenCloseIcon = false, ...props }, ref) => {
         const { open, setOpen } = useDialog();
-        
+
         // Handle ESC key to close dialog
         React.useEffect(() => {
             const handleEsc = (e: KeyboardEvent) => {
@@ -124,35 +117,31 @@ const BasicDialogContent = React.forwardRef<HTMLDivElement, BasicDialogContentPr
                     setOpen(false);
                 }
             };
-            
+
             if (open) {
                 window.addEventListener("keydown", handleEsc);
             }
-            
+
             return () => {
                 window.removeEventListener("keydown", handleEsc);
             };
         }, [open, setOpen]);
-        
+
         if (!open) return null;
-        
+
         return (
             <>
                 {/* Backdrop/Overlay */}
-                <div 
+                <div
                     className={cn(
-                        "fixed inset-0 z-[998] bg-black/80 backdrop-blur-sm",
+                        "fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm",
                         overlayClass
                     )}
                     onClick={() => setOpen(false)}
                 />
-                
+
                 {/* Dialog Content */}
-                <div
-                    ref={ref}
-                    className={cn(dialogVariants({ size }), className)}
-                    {...props}
-                >
+                <div ref={ref} className={cn(dialogVariants({ size }), className)} {...props}>
                     {children}
                     {!hiddenCloseIcon && (
                         <button
@@ -171,7 +160,11 @@ const BasicDialogContent = React.forwardRef<HTMLDivElement, BasicDialogContentPr
 BasicDialogContent.displayName = "BasicDialogContent";
 
 // Dialog Header component
-const BasicDialogHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+const BasicDialogHeader = ({
+    className,
+    children,
+    ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
     <div
         className={cn("flex flex-col space-y-1.5 text-center sm:text-left relative", className)}
         {...props}
@@ -192,19 +185,16 @@ BasicDialogFooter.displayName = "BasicDialogFooter";
 
 // Dialog Title component
 const BasicDialogTitle = ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2
-        className={cn("text-lg font-semibold leading-none tracking-tight", className)}
-        {...props}
-    />
+    <h2 className={cn("text-lg font-semibold leading-none tracking-tight", className)} {...props} />
 );
 BasicDialogTitle.displayName = "BasicDialogTitle";
 
 // Dialog Description component
-const BasicDialogDescription = ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p
-        className={cn("text-sm text-muted-foreground", className)}
-        {...props}
-    />
+const BasicDialogDescription = ({
+    className,
+    ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) => (
+    <p className={cn("text-sm text-muted-foreground", className)} {...props} />
 );
 BasicDialogDescription.displayName = "BasicDialogDescription";
 
@@ -219,19 +209,19 @@ const BasicDialogClose: React.FC<BasicDialogCloseProps> = ({
     ...props
 }) => {
     const { setOpen } = useDialog();
-    
+
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
         setOpen(false);
     };
-    
+
     if (asChild && children) {
         return React.cloneElement(children as React.ReactElement, {
             onClick: handleClick,
             ...props,
         });
     }
-    
+
     return (
         <button type="button" onClick={handleClick} {...props}>
             {children}
