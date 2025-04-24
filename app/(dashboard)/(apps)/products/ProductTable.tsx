@@ -1,30 +1,35 @@
 "use client";
 
-import { Fragment, useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { IProduct, IProductQuery } from "@/apis/product/product.interface";
-import { DataTableColumnHeader } from "@/components/table/advanced/components/data-table-column-header";
 import productApi from "@/apis/product/product.api";
-import { EProductStatus } from "@/constants/enum";
+import { IProduct, IProductQuery } from "@/apis/product/product.interface";
 import { CommonTable } from "@/components/table/CommonTable";
 import { ActionButtons } from "@/components/table/action-buttons";
+import { DataTableColumnHeader } from "@/components/table/advanced/components/data-table-column-header";
 import {
-    renderImage,
+    BadgeColor,
     renderBadge,
     renderColor,
-    renderPrice,
     renderDate,
+    renderImage,
+    renderPrice,
     renderText,
-    BadgeColor,
 } from "@/components/table/cell-renderers";
+import { EProductStatus } from "@/constants/enum";
+import { ColumnDef } from "@tanstack/react-table";
+import { Fragment, useState } from "react";
 // Action buttons are now imported directly
-import UpdateProductDetail from "./components/update-product-detail";
-import CreateProductDetail from "./components/create-product-detail";
-import { toast } from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+    BasicDialog as Dialog,
+    BasicDialogContent as DialogContent,
+    BasicDialogHeader as DialogHeader,
+    BasicDialogTitle as DialogTitle,
+} from "@/components/ui/basic-dialog";
 import { PlusCircle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "react-hot-toast";
+import CreateProductDetail from "./components/create-product-detail";
+import UpdateProductDetail from "./components/update-product-detail";
 
 // Define filter options
 const statusOptions = Object.values(EProductStatus).map((status) => ({

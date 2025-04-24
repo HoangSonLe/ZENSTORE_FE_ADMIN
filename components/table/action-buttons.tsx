@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { EditButton } from "@/components/table/edit-button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+    BasicDialog as Dialog,
+    BasicDialogContent as DialogContent,
+    BasicDialogDescription as DialogDescription,
+    BasicDialogHeader as DialogHeader,
+    BasicDialogTitle as DialogTitle,
+} from "@/components/ui/basic-dialog";
 import { DeleteButton } from "@/components/table/delete-button";
 
 interface ActionButtonsProps<T> {

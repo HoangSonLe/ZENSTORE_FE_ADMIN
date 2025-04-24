@@ -73,13 +73,13 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
         }));
 
         const toolbar =
-            "undo redo | accordion accordionremove | blocks fontfamily fontsize | " +
+            "accordion accordionremove | blocks fontfamily fontsize | " +
             "bold italic underline strikethrough forecolor backcolor | " +
             "alignleft aligncenter alignright alignjustify align | " +
             "bullist numlist outdent indent lineheight | " +
             "link image table media | " +
-            "charmap emoticons codesample code fullscreen preview save print | " +
-            "pagebreak anchor | ltr rtl | removeformat | help";
+            "charmap emoticons fullscreen preview | " +
+            "pagebreak | ltr rtl | removeformat";
 
         const plugins = [
             "advlist",
