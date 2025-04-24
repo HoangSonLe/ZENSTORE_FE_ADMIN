@@ -119,11 +119,23 @@ export function DataTable<TData>({
     });
 
     // Handle page change from server-side pagination
+    const prevPageIndexRef = React.useRef(pagination?.pageIndex || 0);
+
     React.useEffect(() => {
-        if (pagination && table.getState().pagination.pageIndex !== pagination.pageIndex) {
-            pagination.onPageChange(table.getState().pagination.pageIndex + 1);
+        const currentPageIndex = table.getState().pagination.pageIndex;
+
+        // Only trigger onPageChange if the change originated from the table UI
+        // and not from a prop update
+        if (pagination && currentPageIndex !== pagination.pageIndex) {
+            console.log(
+                `DataTable: Page index changed from ${pagination.pageIndex} to ${currentPageIndex}`
+            );
+            pagination.onPageChange(currentPageIndex);
         }
-    }, [table.getState().pagination.pageIndex]);
+
+        // Update the ref for the next render
+        prevPageIndexRef.current = currentPageIndex;
+    }, [table.getState().pagination.pageIndex, pagination]);
 
     // Handle page size change from server-side pagination
     React.useEffect(() => {
@@ -151,13 +163,13 @@ export function DataTable<TData>({
                 filters={filters}
             />
 
-            <div className="rounded-md border relative">
+            <div className="rounded-md border border-border relative">
                 {/* Loading overlay */}
                 {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-20">
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm z-20">
                         <div className="flex flex-col items-center">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                            <span className="mt-2">Loading...</span>
+                            <span className="mt-2 text-foreground">Loading...</span>
                         </div>
                     </div>
                 )}
@@ -165,21 +177,21 @@ export function DataTable<TData>({
                 {/* New synchronized scrolling implementation */}
                 <div
                     className="relative"
-                    style={{ height: `${Math.min(pageSize * 41 + 60, 550)}px` }}
+                    style={{ height: `${Math.min(pageSize * 41 + 60, 550)}px`, minHeight: "400px" }}
                 >
                     {/* Create a container with both horizontal and vertical scrolling */}
                     <div className="overflow-x-auto overflow-y-auto h-full">
                         {/* Table container with fixed width columns */}
                         <table className="w-full border-collapse table-fixed">
                             {/* Table Header */}
-                            <thead className="sticky top-0 z-10 bg-white border-b">
+                            <thead className="sticky top-0 z-10 bg-background border-b border-border">
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <tr key={headerGroup.id}>
                                         {headerGroup.headers.map((header) => (
                                             <th
                                                 key={header.id}
                                                 colSpan={header.colSpan}
-                                                className="h-14 px-4 text-left align-middle font-semibold text-sm text-default-800 capitalize"
+                                                className="h-14 px-4 text-left align-middle font-semibold text-sm text-foreground capitalize"
                                                 style={{
                                                     width: header.column.getSize(),
                                                     minWidth: header.column.getSize(),
@@ -205,13 +217,13 @@ export function DataTable<TData>({
                                         {table.getRowModel().rows.map((row) => (
                                             <tr
                                                 key={row.id}
-                                                className="border-b border-default-300 transition-colors"
+                                                className="border-b border-border transition-colors hover:bg-muted/50"
                                                 data-state={row.getIsSelected() && "selected"}
                                             >
                                                 {row.getVisibleCells().map((cell) => (
                                                     <td
                                                         key={cell.id}
-                                                        className="p-4 align-middle text-sm text-default-600 font-normal"
+                                                        className="p-4 align-middle text-sm text-foreground/80 font-normal"
                                                         style={{
                                                             width: cell.column.getSize(),
                                                             minWidth: cell.column.getSize(),
@@ -237,10 +249,12 @@ export function DataTable<TData>({
                                                 <tr
                                                     key={`empty-${index}`}
                                                     className="border-none bg-transparent hover:bg-transparent"
+                                                    style={{ borderBottom: "none" }}
                                                 >
                                                     <td
                                                         colSpan={columns.length}
                                                         className="h-10 border-none bg-transparent"
+                                                        style={{ borderBottom: "none" }}
                                                     ></td>
                                                 </tr>
                                             ))}
@@ -252,8 +266,8 @@ export function DataTable<TData>({
                                                 colSpan={columns.length}
                                                 className="h-40 text-center align-middle"
                                             >
-                                                <div className="flex flex-col items-center justify-center">
-                                                    <p className="text-lg font-medium text-gray-500 dark:text-gray-400">
+                                                <div className="flex flex-col items-center justify-center w-full">
+                                                    <p className="text-lg font-medium text-muted-foreground text-center w-full">
                                                         No results.
                                                     </p>
                                                 </div>

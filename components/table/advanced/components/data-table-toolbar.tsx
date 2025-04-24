@@ -86,7 +86,14 @@ export function DataTableToolbar({
         if (filters) {
             const initialValues: Record<string, string | string[]> = {};
             Object.entries(filters).forEach(([key, config]) => {
-                initialValues[key] = Array.isArray(config.value) ? [...config.value] : config.value;
+                // Ensure status filter is always initialized as an array
+                if (key === "status") {
+                    initialValues[key] = Array.isArray(config.value) ? [...config.value] : [];
+                } else {
+                    initialValues[key] = Array.isArray(config.value)
+                        ? [...config.value]
+                        : config.value;
+                }
             });
             setTempFilterValues(initialValues);
         }
@@ -103,10 +110,18 @@ export function DataTableToolbar({
         if (isOpen && filters) {
             const config = filters[key];
             if (config) {
-                setTempFilterValues((prev) => ({
-                    ...prev,
-                    [key]: Array.isArray(config.value) ? [...config.value] : config.value,
-                }));
+                // Ensure status filter is always initialized as an array
+                if (key === "status") {
+                    setTempFilterValues((prev) => ({
+                        ...prev,
+                        [key]: Array.isArray(config.value) ? [...config.value] : [],
+                    }));
+                } else {
+                    setTempFilterValues((prev) => ({
+                        ...prev,
+                        [key]: Array.isArray(config.value) ? [...config.value] : config.value,
+                    }));
+                }
             }
         }
 
@@ -116,10 +131,18 @@ export function DataTableToolbar({
             // Just reset the temp value to the original
             const config = filters[key];
             if (config) {
-                setTempFilterValues((prev) => ({
-                    ...prev,
-                    [key]: Array.isArray(config.value) ? [...config.value] : config.value,
-                }));
+                // Ensure status filter is always reset as an array
+                if (key === "status") {
+                    setTempFilterValues((prev) => ({
+                        ...prev,
+                        [key]: Array.isArray(config.value) ? [...config.value] : [],
+                    }));
+                } else {
+                    setTempFilterValues((prev) => ({
+                        ...prev,
+                        [key]: Array.isArray(config.value) ? [...config.value] : config.value,
+                    }));
+                }
             }
         }
     };
@@ -135,25 +158,43 @@ export function DataTableToolbar({
         if (filters && tempFilterValues[key] !== undefined) {
             const config = filters[key];
             if (config) {
-                config.onChange(tempFilterValues[key]);
+                // Ensure status filter is always applied as an array
+                if (key === "status") {
+                    const value = tempFilterValues[key];
+                    const arrayValue = Array.isArray(value) ? value : value ? [value] : [];
+                    config.onChange(arrayValue);
+                } else {
+                    config.onChange(tempFilterValues[key]);
+                }
             }
         }
     };
 
     // Update temp filter value
     const updateTempFilter = (key: string, value: string | string[]) => {
-        setTempFilterValues((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
+        // Ensure status filter is always updated as an array
+        if (key === "status") {
+            const arrayValue = Array.isArray(value) ? value : value ? [value] : [];
+            setTempFilterValues((prev) => ({
+                ...prev,
+                [key]: arrayValue,
+            }));
+        } else {
+            setTempFilterValues((prev) => ({
+                ...prev,
+                [key]: value,
+            }));
+        }
     };
 
     // Reset all filters
     const resetAllFilters = () => {
         // Reset all filters
         if (filters) {
-            Object.entries(filters).forEach(([_, config]) => {
-                config.onChange("");
+            Object.entries(filters).forEach(([key, config]) => {
+                // Use empty array for multi-select filters or status filter, empty string for single-select
+                const emptyValue = config.multi || key === "status" ? [] : "";
+                config.onChange(emptyValue);
             });
         }
 
@@ -232,6 +273,11 @@ export function DataTableToolbar({
                             <DropdownMenuContent className="w-[200px]" align="start" side="bottom">
                                 <DropdownMenuLabel className="capitalize">{key}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
+                                {/* Filter configuration:
+                                    multi: {config.multi},
+                                    valueIsArray: {Array.isArray(config.value)},
+                                    value: {JSON.stringify(config.value)}
+                                */}
                                 {config.multi || Array.isArray(config.value) ? (
                                     // Multi-select (checkboxes)
                                     <>
@@ -301,7 +347,7 @@ export function DataTableToolbar({
                                             <Button
                                                 className="w-full"
                                                 size="sm"
-                                                variant="soft"
+                                                color="secondary"
                                                 onClick={() => closeDropdown(key)}
                                             >
                                                 Apply
@@ -339,7 +385,7 @@ export function DataTableToolbar({
                                             <Button
                                                 className="w-full"
                                                 size="sm"
-                                                variant="soft"
+                                                color="secondary"
                                                 onClick={() => closeDropdown(key)}
                                             >
                                                 Apply
@@ -354,7 +400,7 @@ export function DataTableToolbar({
 
             {/* Reset filters button */}
             {(isFiltered || (filters && Object.values(filters).some((f) => f.value))) && (
-                <Button variant="soft" onClick={resetAllFilters} className="h-8 px-2 lg:px-3">
+                <Button variant="outline" onClick={resetAllFilters} className="h-8 px-2 lg:px-3">
                     Reset All
                     <X className="ltr:ml-2 rtl:mr-2 h-4 w-4" />
                 </Button>
@@ -364,20 +410,15 @@ export function DataTableToolbar({
             <div className="flex items-center gap-2 ml-auto">
                 {/* Search button */}
                 {showGlobalFilter && onSearchChange && (
-                    <Button variant="soft" size="sm" onClick={onSearchSubmit} className="h-8 px-3">
+                    <Button size="sm" onClick={onSearchSubmit} className="h-8 px-3">
                         <Filter className="h-4 w-4 mr-2" />
-                        Tìm kiếm
+                        Search
                     </Button>
                 )}
 
                 {/* Reload button */}
                 {onReload && (
-                    <Button
-                        variant="soft"
-                        onClick={handleReload}
-                        className="h-8 px-3"
-                        title="Reload data"
-                    >
+                    <Button onClick={handleReload} className="h-8 px-3" title="Reload data">
                         <RefreshCw className="h-4 w-4 mr-2" />
                         Reload
                     </Button>

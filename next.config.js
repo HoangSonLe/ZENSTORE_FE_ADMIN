@@ -20,6 +20,8 @@ const nextConfig = {
     // Reduce build output
     output: "standalone",
     poweredByHeader: false,
+    // Fix TinyMCE issues
+    transpilePackages: ["@tinymce/tinymce-react", "tinymce"],
     // Keep existing configs
     webpack(config) {
         // Grab the existing rule that handles SVG imports
