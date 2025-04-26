@@ -92,7 +92,7 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
             "alignleft aligncenter alignright alignjustify align | " +
             "bullist numlist outdent indent lineheight | " +
             "link image table media | " +
-            "charmap emoticons fullscreen preview | " +
+            "charmap emoticons code fullscreen preview | " +
             "pagebreak | ltr rtl | removeformat";
 
         const plugins = [
@@ -113,7 +113,7 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
             "visualchars",
             "fullscreen",
             "media",
-            "codesample",
+            // "codesample",
             "charmap",
             "pagebreak",
             "nonbreaking",

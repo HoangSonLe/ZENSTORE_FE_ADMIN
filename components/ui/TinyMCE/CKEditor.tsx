@@ -106,7 +106,7 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
             "alignleft aligncenter alignright alignjustify align | " +
             "bullist numlist outdent indent lineheight | " +
             "link image table media | " +
-            "charmap emoticons fullscreen preview | " +
+            "charmap emoticons codesample code  fullscreen preview | " +
             "pagebreak | ltr rtl | removeformat";
 
         const plugins = [

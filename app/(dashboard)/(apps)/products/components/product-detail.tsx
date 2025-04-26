@@ -28,6 +28,7 @@ import { IApiResponse, IApiResponseTable } from "@/apis/interface";
 import { ICategory } from "@/apis/category/category.interface";
 import _ from "lodash";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { InsertTemplateButton } from "@/components/template";
 
 interface FileWithPreview extends File {
     preview: string;
@@ -484,7 +485,7 @@ export default function ProductDetail({
     }, [formData]);
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-180px)]">
+        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-190px)]">
             {isLoadingProduct && (
                 <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -786,7 +787,7 @@ export default function ProductDetail({
                                     onChange={(value) =>
                                         handleEditorChange("productShortDetail", value)
                                     }
-                                    height="200px"
+                                    height="300px"
                                 />
                             </div>
                             {errors.productShortDetail && (
@@ -798,9 +799,20 @@ export default function ProductDetail({
 
                         {/* Full Description - span 2 columns */}
                         <div className="space-y-2 col-span-full">
-                            <Label htmlFor="productDetail" className="flex items-center gap-1">
-                                Mô tả chi tiết <span className="text-destructive">*</span>
-                            </Label>
+                            <div className="flex items-center justify-between mb-1">
+                                <Label htmlFor="productDetail" className="flex items-center gap-1">
+                                    Mô tả chi tiết <span className="text-destructive">*</span>
+                                </Label>
+                                <InsertTemplateButton
+                                    onTemplateSelect={(template) => {
+                                        // Insert the template content into the editor
+                                        handleEditorChange(
+                                            "productDetail",
+                                            template.templateDetailContent
+                                        );
+                                    }}
+                                />
+                            </div>
                             <div
                                 className={
                                     errors.productDetail ? "border border-destructive rounded" : ""
@@ -810,7 +822,7 @@ export default function ProductDetail({
                                     initialValue={formData.productDetail as string}
                                     value={formData.productDetail as string}
                                     onChange={(value) => handleEditorChange("productDetail", value)}
-                                    height="300px"
+                                    height="600px"
                                 />
                             </div>
                             {errors.productDetail && (

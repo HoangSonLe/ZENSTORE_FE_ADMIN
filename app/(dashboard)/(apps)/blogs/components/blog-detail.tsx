@@ -200,7 +200,7 @@ export default function BlogDetail({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-180px)]">
+        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-190px)]">
             {/* Validation Alert */}
             {showValidationError && Object.keys(errors).length > 0 && (
                 <Alert variant="destructive" className="mb-4">
@@ -242,7 +242,7 @@ export default function BlogDetail({
                             <ClientSideCustomEditor
                                 initialValue={formData.newsShortContent}
                                 onChange={(value) => handleEditorChange("newsShortContent", value)}
-                                height="150px"
+                                height="300px"
                             />
                         </div>
                         {errors.newsShortContent && (
@@ -283,7 +283,7 @@ export default function BlogDetail({
                             <ClientSideCustomEditor
                                 initialValue={formData.newsDetailContent}
                                 onChange={(value) => handleEditorChange("newsDetailContent", value)}
-                                height="300px"
+                                height="600px"
                             />
                         </div>
                         {errors.newsDetailContent && (
