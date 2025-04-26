@@ -90,7 +90,7 @@ const MobileSidebar = ({ className, trans }: { className?: string; trans: any })
                             <li key={`menu_key_${i}`}>
                                 {/* single menu  */}
 
-                                {"child" in item && !item.child && !item.isHeader && (
+                                {!("child" in item) && !item?.isHeader && (
                                     <SingleMenuItem item={item} collapsed={collapsed} />
                                 )}
 
