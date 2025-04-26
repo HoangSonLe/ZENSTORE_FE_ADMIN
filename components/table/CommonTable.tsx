@@ -3,6 +3,8 @@
 import { Fragment, useState, useEffect, useRef, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/table/advanced/components/data-table";
+import { ISelectOption } from "@/apis/base/base.interface";
+import { title } from "process";
 
 // Define a generic interface for API query parameters
 export interface CommonTableQuery {
@@ -21,18 +23,13 @@ export interface CommonTableResponse<T> {
     [key: string]: any; // Allow for additional response data
 }
 
-// Define a generic interface for filter options
-export interface FilterOption {
-    value: string;
-    label: string;
-}
-
 // Define a generic interface for filter configuration
 export interface FilterConfig {
-    options: FilterOption[];
+    options: ISelectOption[];
     value: string | string[];
     onChange: (value: string | string[]) => void;
     multi: boolean;
+    title?: string; // Title for the filter
 }
 
 // Define props for the CommonTable component
@@ -43,7 +40,14 @@ export interface CommonTableProps<T, Q extends CommonTableQuery> {
 
     // Optional props
     initialFilters?: Record<string, any>;
-    filterOptions?: Record<string, FilterOption[]>;
+    filterOptions?: Record<
+        string,
+        | ISelectOption[]
+        | {
+              options: ISelectOption[];
+              title?: string;
+          }
+    >;
     filterMapping?: Record<string, string>; // Maps UI filter keys to API parameter names
     defaultSorting?: SortingState;
     defaultPageSize?: number;
@@ -326,12 +330,28 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
     );
 
     // Prepare filters for the DataTable component
-    const tableFilters = Object.entries(filterOptions).reduce((acc, [key, options]) => {
+    const tableFilters = Object.entries(filterOptions).reduce((acc, [key, filterConfig]) => {
         // Explicitly set multi flag for status filter
         const isMultiSelect = key === "status" ? true : Array.isArray(filters[key]);
 
+        // Get the filter options and title
+        let options: ISelectOption[];
+        let title: string | undefined;
+
+        if (Array.isArray(filterConfig)) {
+            // Simple array of options
+            options = filterConfig;
+            // Default title is capitalized key
+            title = key.charAt(0).toUpperCase() + key.slice(1);
+        } else {
+            // Object with options and optional title
+            options = filterConfig.options;
+            title = filterConfig.title || key.charAt(0).toUpperCase() + key.slice(1);
+        }
+
         // Log filter configuration for debugging
         console.log(`Filter ${key}:`, {
+            title,
             value: filters[key],
             isArray: Array.isArray(filters[key]),
             multi: isMultiSelect,
@@ -342,6 +362,7 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
             value: filters[key] || (Array.isArray(filters[key]) ? [] : ""),
             onChange: (value: string | string[]) => handleFilterChange(key, value),
             multi: isMultiSelect, // Use our explicit multi flag
+            title, // Add the title to the filter config
         };
         return acc;
     }, {} as Record<string, FilterConfig>);

@@ -1,6 +1,7 @@
 "use client";
 
 import productApi from "@/apis/product/product.api";
+import categoryApi from "@/apis/category/category.api";
 import { IProduct, IProductQuery } from "@/apis/product/product.interface";
 import { CommonTable } from "@/components/table/CommonTable";
 import { ActionButtons } from "@/components/table/action-buttons";
@@ -14,7 +15,7 @@ import {
     renderPrice,
     renderText,
 } from "@/components/table/cell-renderers";
-import { EProductStatus } from "@/constants/enum";
+import { ECategoryType, EProductStatus } from "@/constants/enum";
 import { ColumnDef } from "@tanstack/react-table";
 import { Fragment, useState } from "react";
 // Action buttons are now imported directly
@@ -30,38 +31,59 @@ import { PlusCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
 import CreateProductDetail from "./components/create-product-detail";
 import UpdateProductDetail from "./components/update-product-detail";
-
-// Define filter options
-const statusOptions = Object.values(EProductStatus).map((status) => ({
-    value: status,
-    label: status.replace("_", " "),
-}));
-
-const spaceOptions = [
-    { value: "LIVING", label: "Living Room" },
-    { value: "BEDROOM", label: "Bedroom" },
-    { value: "KITCHEN", label: "Kitchen" },
-    { value: "BATHROOM", label: "Bathroom" },
-];
-
-const seriesOptions = [
-    { value: "MODERN", label: "Modern" },
-    { value: "CLASSIC", label: "Classic" },
-    { value: "VINTAGE", label: "Vintage" },
-    { value: "MINIMALIST", label: "Minimalist" },
-];
-
-const colorOptions = [
-    { value: "BLACK", label: "Black" },
-    { value: "WHITE", label: "White" },
-    { value: "BROWN", label: "Brown" },
-    { value: "GRAY", label: "Gray" },
-];
+import { ISelectOption } from "@/apis/base/base.interface";
+import { useApi } from "@/hooks/useApi";
+import _ from "lodash";
+import { IApiResponseTable } from "@/apis/interface";
+import { ICategory } from "@/apis/category/category.interface";
+import { useAsyncEffect } from "@/hooks";
 
 // Define the ProductTable component
 export default function ProductTable() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+    const [seriesCodeDataOptions, setSeriesCodeDataOptions] = useState<ISelectOption[]>([]);
+    const [colorCodeDataOptions, setColorCodeDataOptions] = useState<ISelectOption[]>([]);
+    const [spaceCodeDataOptions, setSpaceCodeDataOptions] = useState<ISelectOption[]>([]);
+    const [statusCodeDataOptions, setStatusCodeDataOptions] = useState<ISelectOption[]>([]);
+    const { request: getCategoryDataOptions } = useApi(categoryApi.getCategoryDataOptions);
+
+    useAsyncEffect(async () => {
+        await getDataOptions();
+    });
+
+    const getDataOptions = async () => {
+        try {
+            await getCategoryDataOptions(undefined, (response: any) => {
+                const { data } = response as IApiResponseTable<ICategory>;
+
+                // Map API response
+                const apiOptions: ISelectOption[] = data.data
+                    .filter((i) => i.categoryCode !== "ALL")
+                    .map((item: ICategory) => ({
+                        label: _.get(item, "categoryName"),
+                        value: _.get(item, "categoryCode"),
+                        type: _.get(item, "categoryType"),
+                    }));
+
+                setSeriesCodeDataOptions(
+                    apiOptions.filter((item) => item.type === ECategoryType.SERIES)
+                );
+                setColorCodeDataOptions(
+                    apiOptions.filter((item) => item.type === ECategoryType.COLOR)
+                );
+                setSpaceCodeDataOptions(
+                    apiOptions.filter((item) => item.type === ECategoryType.SPACE)
+                );
+                setStatusCodeDataOptions(
+                    apiOptions.filter((item) => item.type === ECategoryType.STATUS)
+                );
+            });
+        } catch (error) {
+            console.error("Error fetching series code data options:", error);
+        }
+    };
 
     // Function to fetch products from the API
     const fetchProducts = async (params: IProductQuery) => {
@@ -139,20 +161,20 @@ export default function ProductTable() {
         },
         {
             accessorKey: "listImage",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Image" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Ảnh" />,
             cell: ({ row }) => renderImage(row, "listImage", "productName"),
             enableSorting: false,
             size: 100,
         },
         {
             accessorKey: "productName",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Tên sản phẩm" />,
             cell: ({ row }) => renderText(row, "productName"),
             size: 200,
         },
         {
             accessorKey: "productStatusCode",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Trạng thái" />,
             cell: ({ row }) => {
                 // Define color mapping for status badges
                 const colorMapping: Record<string, BadgeColor> = {
@@ -185,13 +207,13 @@ export default function ProductTable() {
         },
         {
             accessorKey: "productSpaceName",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Space" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Dung lượng" />,
             cell: ({ row }) => renderBadge(row, "productSpaceName", "info"),
             size: 120,
         },
         {
             accessorKey: "productColorName",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Color" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Màu" />,
             cell: ({ row }) => {
                 // Define color mapping for color circles
                 const colorMapping: Record<string, string> = {
@@ -206,7 +228,7 @@ export default function ProductTable() {
         },
         {
             accessorKey: "productPriceSale",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Giá" />,
             cell: ({ row }) => renderPrice(row, "productPriceSale", "productPrice"),
             size: 120,
         },
@@ -218,13 +240,13 @@ export default function ProductTable() {
         },
         {
             accessorKey: "updatedAt",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Last Updated" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Cập nhật cuối" />,
             cell: ({ row }) => renderDate(row, "updatedAt", "HH:mm DD/MM/YYYY", "right"),
             size: 140,
         },
         {
             id: "actions",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Thao tác" />,
             cell: ({ row }) => (
                 <ActionButtons
                     row={row.original}
@@ -251,23 +273,35 @@ export default function ProductTable() {
 
     // Define initial filters
     const initialFilters = {
-        status: [] as string[], // Use UI filter names, not API parameter names
+        status: [] as string[], // Use UI filter names, not API parameter names,
         space: "",
         series: "",
         color: "",
     };
 
-    // Define filter options for the CommonTable
+    // Define filter options for the CommonTable with explicit titles
     const filterOptions = {
-        status: statusOptions,
-        space: spaceOptions,
-        series: seriesOptions,
-        color: colorOptions,
+        status: {
+            options: statusCodeDataOptions,
+            title: "Trạng thái",
+        },
+        space: {
+            options: spaceCodeDataOptions,
+            title: "Dung lượng",
+        },
+        series: {
+            options: seriesCodeDataOptions,
+            title: "Series",
+        },
+        color: {
+            options: colorCodeDataOptions,
+            title: "Màu",
+        },
     };
 
     // Map filter keys to API parameter names
     const filterMapping = {
-        status: "statusCode",
+        status: "statusCodes",
         space: "spaceCode",
         series: "seriCode",
         color: "colorCode",
@@ -282,7 +316,7 @@ export default function ProductTable() {
                     className="flex items-center gap-2"
                 >
                     <PlusCircle className="h-4 w-4" />
-                    Create Product
+                    Tạo mới
                 </Button>
             </div>
 
@@ -290,7 +324,7 @@ export default function ProductTable() {
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogContent size="5xl" className="w-full max-w-[1200px]">
                     <DialogHeader>
-                        <DialogTitle>Create New Product</DialogTitle>
+                        <DialogTitle>Tạo mới</DialogTitle>
                     </DialogHeader>
                     <CreateProductDetail
                         onClose={() => setIsCreateDialogOpen(false)}
@@ -306,8 +340,8 @@ export default function ProductTable() {
                 filterOptions={filterOptions}
                 filterMapping={filterMapping}
                 sortMapping={sortMapping}
-                title="Product List"
-                defaultPageSize={2}
+                title="Danh sách sản phẩm"
+                defaultPageSize={10}
                 key={refreshTrigger} // Add key to force re-render when data changes
             />
         </Fragment>

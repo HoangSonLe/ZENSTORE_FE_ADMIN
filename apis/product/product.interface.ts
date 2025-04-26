@@ -25,5 +25,5 @@ export interface IProductQuery extends IPagingQuery {
     seriCode?: string;
     colorCode?: string;
     spaceCode?: string;
-    statusCode?: string[];
+    statusCodes?: string[];
 }

@@ -174,48 +174,39 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         // Determine if we need to show the clear button
         const showClearButton = allowClear && hasValue();
 
-        // Create the input element
-        const inputElement = (
-            <input
-                type={type}
-                className={cn(
-                    inputVariants({ color, size, radius, variant, shadow }),
-                    showClearButton ? "pr-8" : "",
-                    className
-                )}
-                ref={ref}
-                {...props}
-            />
+        // Common wrapper class
+        const wrapperClass = removeWrapper
+            ? "relative inline-block w-full"
+            : "relative flex-1 w-full";
+
+        return (
+            <div className={wrapperClass}>
+                <div className="relative w-full flex items-center">
+                    <input
+                        type={type}
+                        className={cn(
+                            inputVariants({ color, size, radius, variant, shadow }),
+                            showClearButton ? "pr-8" : "",
+                            className
+                        )}
+                        ref={ref}
+                        {...props}
+                    />
+                    {showClearButton && (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <button
+                                type="button"
+                                onClick={handleClear}
+                                className="h-5 w-5 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none transition-colors pointer-events-auto"
+                                aria-label="Clear input"
+                            >
+                                <X className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
         );
-
-        // Create the clear button
-        const clearButton = showClearButton ? (
-            <button
-                type="button"
-                onClick={handleClear}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none transition-colors"
-                aria-label="Clear input"
-            >
-                <X className="h-4 w-4" />
-            </button>
-        ) : null;
-
-        // Return the input with or without wrapper
-        if (removeWrapper) {
-            return (
-                <div className="relative inline-block w-full">
-                    {inputElement}
-                    {clearButton}
-                </div>
-            );
-        } else {
-            return (
-                <div className="relative flex-1 w-full">
-                    {inputElement}
-                    {clearButton}
-                </div>
-            );
-        }
     }
 );
 Input.displayName = "Input";

@@ -18,9 +18,13 @@ import { Table } from "@tanstack/react-table";
 
 interface DataTablePaginationProps {
     table: Table<any>;
+    isShowSummarySelected?: boolean;
 }
 
-export function DataTablePagination({ table }: DataTablePaginationProps) {
+export function DataTablePagination({
+    table,
+    isShowSummarySelected = false,
+}: DataTablePaginationProps) {
     // Function to render page numbers
     const renderPageNumbers = (table: Table<any>) => {
         const currentPage = table.getState().pagination.pageIndex + 1;
@@ -140,13 +144,15 @@ export function DataTablePagination({ table }: DataTablePaginationProps) {
     return (
         <div className="flex items-center flex-wrap gap-2 justify-between px-2">
             <div className="flex-1 text-sm text-muted-foreground whitespace-nowrap">
-                {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
+                {isShowSummarySelected
+                    ? `${table.getFilteredSelectedRowModel().rows.length} của
+                    ${table.getFilteredRowModel().rows.length} dòng đang được chọn.`
+                    : `Tổng ${table.getFilteredRowModel().rows.length} dòng.`}
             </div>
             <div className="flex flex-wrap items-center gap-6 lg:gap-8">
                 <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-muted-foreground whitespace-nowrap">
-                        Rows per page
+                        Dòng trên trang
                     </p>
                     <Select
                         value={`${table.getState().pagination.pageSize}`}
@@ -173,7 +179,7 @@ export function DataTablePagination({ table }: DataTablePaginationProps) {
                         onClick={() => table.setPageIndex(0)}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        <span className="sr-only">Go to first page</span>
+                        <span className="sr-only">Đến trang đầu</span>
                         <ChevronsLeft className="h-4 w-4 rtl:rotate-180" />
                     </Button>
                     <Button
@@ -185,7 +191,7 @@ export function DataTablePagination({ table }: DataTablePaginationProps) {
                         }}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        <span className="sr-only">Go to previous page</span>
+                        <span className="sr-only">Quay lại trang trước</span>
                         <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
                     </Button>
 
@@ -201,7 +207,7 @@ export function DataTablePagination({ table }: DataTablePaginationProps) {
                         }}
                         disabled={!table.getCanNextPage()}
                     >
-                        <span className="sr-only">Go to next page</span>
+                        <span className="sr-only">Đến trang tiếp</span>
                         <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                     </Button>
                     <Button
@@ -210,7 +216,7 @@ export function DataTablePagination({ table }: DataTablePaginationProps) {
                         onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                         disabled={!table.getCanNextPage()}
                     >
-                        <span className="sr-only">Go to last page</span>
+                        <span className="sr-only">Đến trang cuối</span>
                         <ChevronsRight className="h-4 w-4 rtl:rotate-180" />
                     </Button>
                 </div>

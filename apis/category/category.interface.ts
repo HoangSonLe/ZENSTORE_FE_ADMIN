@@ -3,7 +3,7 @@ import { IPagingQuery } from "../interface";
 
 export interface ICategory {
     categoryId: number;
-    categoryType: string;
+    categoryType: ECategoryType;
     categoryCode: string;
     categoryName: string;
 }

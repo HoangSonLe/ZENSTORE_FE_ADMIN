@@ -7,7 +7,7 @@ const DataTablePage = () => {
         <div className="space-y-5">
             <Card>
                 <CardHeader>
-                    <CardTitle>Products</CardTitle>
+                    <CardTitle>Sản phẩm</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <ProductTable />
