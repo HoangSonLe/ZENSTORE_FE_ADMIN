@@ -92,10 +92,32 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Function to fetch data from the API
+    // Using useRef to store the latest values without triggering re-renders
+    const stateRef = useRef({
+        pagination,
+        sorting,
+        searchQuery,
+        filters,
+    });
+
+    // Update the ref whenever these values change
+    useEffect(() => {
+        stateRef.current = {
+            pagination,
+            sorting,
+            searchQuery,
+            filters,
+        };
+    }, [pagination, sorting, searchQuery, filters]);
+
+    // Define fetchTableData without dependencies on changing state
     const fetchTableData = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
+            // Get the latest state from the ref
+            const { pagination, sorting, searchQuery, filters } = stateRef.current;
+
             // Convert TanStack Table sorting to API sorting format
             let sortParam: number | undefined = undefined;
 
@@ -158,15 +180,12 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
             setIsLoading(false);
         }
     }, [
-        pagination.pageNumber,
-        pagination.pageSize,
-        searchQuery,
-        sorting,
-        filters,
+        // Only include dependencies that don't change frequently
         fetchData,
         sortMapping,
         filterMapping,
         onError,
+        // Remove state dependencies to prevent infinite loops
     ]);
 
     // Debounced fetch function
@@ -178,19 +197,10 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
             fetchTableData();
             timeoutRef.current = null;
         }, 300); // Debounce delay
-    }, [fetchTableData]);
+    }, []); // Remove fetchTableData from dependencies to prevent infinite loops
 
-    // Effect for initial data fetch
-    useEffect(() => {
-        fetchTableData();
-
-        // Clean up any pending timeouts on unmount
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, []); // Empty dependency array means this runs once on mount
+    // Effect for initial data fetch - removed to prevent double fetching
+    // The combined effect below will handle the initial fetch
 
     // Use refs to track what triggered the data fetch
     const isFirstRenderRef = useRef(true);
@@ -204,9 +214,21 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
 
     // Combined effect for all data fetching triggers
     useEffect(() => {
-        // Skip the first render to avoid double fetching
+        // On first render, just fetch data and update refs
         if (isFirstRenderRef.current) {
             isFirstRenderRef.current = false;
+
+            // Update refs to initial values
+            lastPaginationRef.current = {
+                pageNumber: pagination.pageNumber,
+                pageSize: pagination.pageSize,
+            };
+            lastSortingRef.current = JSON.stringify(sorting);
+            lastFiltersRef.current = JSON.stringify(filters);
+            lastSearchRef.current = searchQuery;
+
+            // Initial data fetch
+            fetchTableData();
             return;
         }
 
@@ -242,7 +264,7 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
         // Use debounced fetch for search and filter changes, immediate fetch for pagination and sorting
         if (searchChanged || filtersChanged) {
             debouncedFetch();
-        } else {
+        } else if (paginationChanged || sortingChanged) {
             fetchTableData();
         }
     }, [
@@ -251,8 +273,7 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
         JSON.stringify(sorting),
         JSON.stringify(filters),
         searchQuery,
-        fetchTableData,
-        debouncedFetch,
+        // Remove fetchTableData and debouncedFetch from dependencies to prevent infinite loops
     ]);
 
     // Handler functions

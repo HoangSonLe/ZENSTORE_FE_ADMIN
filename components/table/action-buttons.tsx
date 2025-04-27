@@ -49,11 +49,11 @@ export function ActionButtons<T>({
             {/* Update Dialog */}
             {renderUpdateForm && (
                 <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-                    <DialogContent size="5xl" className="w-full max-w-[1200px]">
+                    <DialogContent size="5xl" className="w-full max-w-[1200px] max-h-[90vh] p-6">
                         <DialogHeader>
                             <DialogTitle>Chỉnh sửa</DialogTitle>
                             <DialogDescription>
-                                Cập nhật thông tin sản phẩm. Các trường có dấu * là bắt buộc.
+                                Cập nhật thông tin. Các trường có dấu * là bắt buộc.
                             </DialogDescription>
                         </DialogHeader>
                         {renderUpdateForm(row, () => setShowUpdateDialog(false))}

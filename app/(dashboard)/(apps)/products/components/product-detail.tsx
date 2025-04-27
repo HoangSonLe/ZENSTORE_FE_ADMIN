@@ -27,6 +27,7 @@ import { ISelectOption } from "@/apis/base/base.interface";
 import { IApiResponse, IApiResponseTable } from "@/apis/interface";
 import { ICategory } from "@/apis/category/category.interface";
 import _ from "lodash";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FileWithPreview extends File {
     preview: string;
@@ -483,7 +484,7 @@ export default function ProductDetail({
     }, [formData]);
 
     return (
-        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[85vh]">
+        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-180px)]">
             {isLoadingProduct && (
                 <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -491,318 +492,363 @@ export default function ProductDetail({
                 </div>
             )}
 
+            {/* Validation Alert */}
             {showValidationError && Object.keys(errors).length > 0 && (
                 <Alert className="mb-4 bg-destructive/15 text-destructive">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>Vui lòng điều đủ dữ liệu trước khi lưu.</AlertDescription>
+                    <AlertDescription>Vui lòng điền đủ dữ liệu trước khi lưu.</AlertDescription>
                 </Alert>
             )}
+
+            {/* Scrollable Content Area */}
             {!isLoadingProduct && (
-                <div className="grid gap-6 py-4">
-                    {/* Grid layout with 2 columns */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Tên sản phẩm - span 1 column */}
-                        <div className="space-y-2">
-                            <Label htmlFor="productName" className="flex items-center gap-1">
-                                Tên sản phẩm <span className="text-destructive">*</span>
-                            </Label>
-                            <Input
-                                id="productName"
-                                name="productName"
-                                value={formData.productName}
-                                onChange={handleChange}
-                                className={errors.productName ? "border-destructive" : ""}
-                            />
-                            {errors.productName && (
-                                <p className="text-xs text-destructive mt-1">
-                                    {errors.productName}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Price - span 1 column */}
-                        <div className="space-y-2">
-                            <Label htmlFor="productPrice" className="flex items-center gap-1">
-                                Giá <span className="text-destructive">*</span>
-                            </Label>
-                            <Input
-                                id="productPrice"
-                                name="productPrice"
-                                type="text"
-                                value={formData.productPrice}
-                                onChange={handleChange}
-                                className={errors.productPrice ? "border-destructive" : ""}
-                            />
-                            {errors.productPrice && (
-                                <p className="text-xs text-destructive mt-1">
-                                    {errors.productPrice}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Sale Price - span 1 column */}
-                        <div className="space-y-2">
-                            <Label htmlFor="productPriceSale">Giá khuyến mãi</Label>
-                            <Input
-                                id="productPriceSale"
-                                name="productPriceSale"
-                                type="text"
-                                value={formData.productPriceSale}
-                                onChange={handleChange}
-                            />
-                        </div>
-
-                        {/* Trạng thái - span 1 column */}
-                        <div className="space-y-2">
-                            <Label htmlFor="productStatusCode" className="flex items-center gap-1">
-                                Trạng thái <span className="text-destructive">*</span>
-                            </Label>
-                            <div className="select-dropdown-fix">
-                                <Select
-                                    value={formData.productStatusCode as string}
-                                    onValueChange={(value) =>
-                                        handleSelectChange("productStatusCode", value)
-                                    }
-                                >
-                                    <SelectTrigger
-                                        className={
-                                            errors.productStatusCode ? "border-destructive" : ""
-                                        }
-                                        disabled={isLoadingOptions}
-                                    >
-                                        <SelectValue
-                                            placeholder={
-                                                isLoadingOptions ? "Đang tải..." : "Chọn trạng thái"
-                                            }
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" sideOffset={5}>
-                                        {statusCodeDataOptions &&
-                                        statusCodeDataOptions.length > 0 ? (
-                                            statusCodeDataOptions.map((status) => (
-                                                <SelectItem key={status.value} value={status.value}>
-                                                    {status.label}
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem value="loading">Đang tải....</SelectItem>
-                                        )}
-                                    </SelectContent>
-                                </Select>
+                <ScrollArea className="flex-1 pr-4">
+                    <div className="grid gap-6 py-4">
+                        {/* Grid layout with 2 columns */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Tên sản phẩm - span 1 column */}
+                            <div className="space-y-2">
+                                <Label htmlFor="productName" className="flex items-center gap-1">
+                                    Tên sản phẩm <span className="text-destructive">*</span>
+                                </Label>
+                                <Input
+                                    id="productName"
+                                    name="productName"
+                                    value={formData.productName}
+                                    onChange={handleChange}
+                                    className={errors.productName ? "border-destructive" : ""}
+                                />
+                                {errors.productName && (
+                                    <p className="text-xs text-destructive mt-1">
+                                        {errors.productName}
+                                    </p>
+                                )}
                             </div>
-                            {errors.productStatusCode && (
-                                <p className="text-xs text-destructive mt-1">
-                                    {errors.productStatusCode}
-                                </p>
-                            )}
-                        </div>
 
-                        {/* Space - span 1 column */}
-                        <div className="space-y-2">
-                            <Label htmlFor="productSpaceCode" className="flex items-center gap-1">
-                                Dung lượng lưu trữ <span className="text-destructive">*</span>
-                            </Label>
-                            <div className="select-dropdown-fix">
-                                <Select
-                                    value={formData.productSpaceCode as string}
-                                    onValueChange={(value) =>
-                                        handleSelectChange("productSpaceCode", value)
-                                    }
-                                >
-                                    <SelectTrigger
-                                        className={
-                                            errors.productSpaceCode ? "border-destructive" : ""
-                                        }
-                                        disabled={isLoadingOptions}
-                                    >
-                                        <SelectValue
-                                            placeholder={
-                                                isLoadingOptions ? "Đang tải..." : "Chọn dung lượng"
-                                            }
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" sideOffset={5}>
-                                        {spaceCodeDataOptions && spaceCodeDataOptions.length > 0 ? (
-                                            spaceCodeDataOptions.map((space) => (
-                                                <SelectItem key={space.value} value={space.value}>
-                                                    {space.label}
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem value="loading">Đang tải...</SelectItem>
-                                        )}
-                                    </SelectContent>
-                                </Select>
+                            {/* Price - span 1 column */}
+                            <div className="space-y-2">
+                                <Label htmlFor="productPrice" className="flex items-center gap-1">
+                                    Giá <span className="text-destructive">*</span>
+                                </Label>
+                                <Input
+                                    id="productPrice"
+                                    name="productPrice"
+                                    type="text"
+                                    value={formData.productPrice}
+                                    onChange={handleChange}
+                                    className={errors.productPrice ? "border-destructive" : ""}
+                                />
+                                {errors.productPrice && (
+                                    <p className="text-xs text-destructive mt-1">
+                                        {errors.productPrice}
+                                    </p>
+                                )}
                             </div>
-                            {errors.productSpaceCode && (
-                                <p className="text-xs text-destructive mt-1">
-                                    {errors.productSpaceCode}
-                                </p>
-                            )}
-                        </div>
 
-                        {/* Series - span 1 column */}
-                        <div className="space-y-2">
-                            <Label htmlFor="productSeriesCode" className="flex items-center gap-1">
-                                Series <span className="text-destructive">*</span>
-                            </Label>
-                            <div className="select-dropdown-fix">
-                                <Select
-                                    value={formData.productSeriesCode as string}
-                                    onValueChange={(value) =>
-                                        handleSelectChange("productSeriesCode", value)
-                                    }
-                                >
-                                    <SelectTrigger
-                                        className={
-                                            errors.productSeriesCode ? "border-destructive" : ""
-                                        }
-                                        disabled={isLoadingOptions}
-                                    >
-                                        <SelectValue
-                                            placeholder={
-                                                isLoadingOptions ? "Đang tải..." : "Chọn series"
-                                            }
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" sideOffset={5}>
-                                        {seriesCodeDataOptions &&
-                                        seriesCodeDataOptions.length > 0 ? (
-                                            seriesCodeDataOptions.map((series) => (
-                                                <SelectItem key={series.value} value={series.value}>
-                                                    {series.label}
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem value="loading">Đang tải...</SelectItem>
-                                        )}
-                                    </SelectContent>
-                                </Select>
+                            {/* Sale Price - span 1 column */}
+                            <div className="space-y-2">
+                                <Label htmlFor="productPriceSale">Giá khuyến mãi</Label>
+                                <Input
+                                    id="productPriceSale"
+                                    name="productPriceSale"
+                                    type="text"
+                                    value={formData.productPriceSale}
+                                    onChange={handleChange}
+                                />
                             </div>
-                            {errors.productSeriesCode && (
-                                <p className="text-xs text-destructive mt-1">
-                                    {errors.productSeriesCode}
-                                </p>
-                            )}
-                        </div>
 
-                        {/* Color - span 1 column */}
-                        <div className="space-y-2">
-                            <Label htmlFor="productColorCode" className="flex items-center gap-1">
-                                Màu <span className="text-destructive">*</span>
-                            </Label>
-                            <div className="select-dropdown-fix">
-                                <Select
-                                    value={formData.productColorCode as string}
-                                    onValueChange={(value) =>
-                                        handleSelectChange("productColorCode", value)
-                                    }
+                            {/* Trạng thái - span 1 column */}
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="productStatusCode"
+                                    className="flex items-center gap-1"
                                 >
-                                    <SelectTrigger
-                                        className={
-                                            errors.productColorCode ? "border-destructive" : ""
+                                    Trạng thái <span className="text-destructive">*</span>
+                                </Label>
+                                <div className="select-dropdown-fix">
+                                    <Select
+                                        value={formData.productStatusCode as string}
+                                        onValueChange={(value) =>
+                                            handleSelectChange("productStatusCode", value)
                                         }
-                                        disabled={isLoadingOptions}
                                     >
-                                        <SelectValue
-                                            placeholder={
-                                                isLoadingOptions ? "Đang tải..." : "Chọn màu"
+                                        <SelectTrigger
+                                            className={
+                                                errors.productStatusCode ? "border-destructive" : ""
                                             }
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" sideOffset={5}>
-                                        {colorCodeDataOptions && colorCodeDataOptions.length > 0 ? (
-                                            colorCodeDataOptions.map((color) => (
-                                                <SelectItem key={color.value} value={color.value}>
-                                                    {color.label}
+                                            disabled={isLoadingOptions}
+                                        >
+                                            <SelectValue
+                                                placeholder={
+                                                    isLoadingOptions
+                                                        ? "Đang tải..."
+                                                        : "Chọn trạng thái"
+                                                }
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent position="popper" sideOffset={5}>
+                                            {statusCodeDataOptions &&
+                                            statusCodeDataOptions.length > 0 ? (
+                                                statusCodeDataOptions.map((status) => (
+                                                    <SelectItem
+                                                        key={status.value}
+                                                        value={status.value}
+                                                    >
+                                                        {status.label}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <SelectItem value="loading">
+                                                    Đang tải....
                                                 </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem value="loading">Đang tải...</SelectItem>
-                                        )}
-                                    </SelectContent>
-                                </Select>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {errors.productStatusCode && (
+                                    <p className="text-xs text-destructive mt-1">
+                                        {errors.productStatusCode}
+                                    </p>
+                                )}
                             </div>
-                            {errors.productColorCode && (
-                                <p className="text-xs text-destructive mt-1">
-                                    {errors.productColorCode}
-                                </p>
-                            )}
-                        </div>
-                    </div>
 
-                    {/* Short Description - span 2 columns */}
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="productShortDetail" className="flex items-center gap-1">
-                            Mô tả <span className="text-destructive">*</span>
-                        </Label>
-                        <div
-                            className={
-                                errors.productShortDetail ? "border border-destructive rounded" : ""
-                            }
-                        >
-                            <ClientSideCustomEditor
-                                initialValue={formData.productShortDetail as string}
-                                value={formData.productShortDetail as string}
-                                onChange={(value) =>
-                                    handleEditorChange("productShortDetail", value)
+                            {/* Space - span 1 column */}
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="productSpaceCode"
+                                    className="flex items-center gap-1"
+                                >
+                                    Dung lượng lưu trữ <span className="text-destructive">*</span>
+                                </Label>
+                                <div className="select-dropdown-fix">
+                                    <Select
+                                        value={formData.productSpaceCode as string}
+                                        onValueChange={(value) =>
+                                            handleSelectChange("productSpaceCode", value)
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            className={
+                                                errors.productSpaceCode ? "border-destructive" : ""
+                                            }
+                                            disabled={isLoadingOptions}
+                                        >
+                                            <SelectValue
+                                                placeholder={
+                                                    isLoadingOptions
+                                                        ? "Đang tải..."
+                                                        : "Chọn dung lượng"
+                                                }
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent position="popper" sideOffset={5}>
+                                            {spaceCodeDataOptions &&
+                                            spaceCodeDataOptions.length > 0 ? (
+                                                spaceCodeDataOptions.map((space) => (
+                                                    <SelectItem
+                                                        key={space.value}
+                                                        value={space.value}
+                                                    >
+                                                        {space.label}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <SelectItem value="loading">Đang tải...</SelectItem>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {errors.productSpaceCode && (
+                                    <p className="text-xs text-destructive mt-1">
+                                        {errors.productSpaceCode}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Series - span 1 column */}
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="productSeriesCode"
+                                    className="flex items-center gap-1"
+                                >
+                                    Series <span className="text-destructive">*</span>
+                                </Label>
+                                <div className="select-dropdown-fix">
+                                    <Select
+                                        value={formData.productSeriesCode as string}
+                                        onValueChange={(value) =>
+                                            handleSelectChange("productSeriesCode", value)
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            className={
+                                                errors.productSeriesCode ? "border-destructive" : ""
+                                            }
+                                            disabled={isLoadingOptions}
+                                        >
+                                            <SelectValue
+                                                placeholder={
+                                                    isLoadingOptions ? "Đang tải..." : "Chọn series"
+                                                }
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent position="popper" sideOffset={5}>
+                                            {seriesCodeDataOptions &&
+                                            seriesCodeDataOptions.length > 0 ? (
+                                                seriesCodeDataOptions.map((series) => (
+                                                    <SelectItem
+                                                        key={series.value}
+                                                        value={series.value}
+                                                    >
+                                                        {series.label}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <SelectItem value="loading">Đang tải...</SelectItem>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {errors.productSeriesCode && (
+                                    <p className="text-xs text-destructive mt-1">
+                                        {errors.productSeriesCode}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Color - span 1 column */}
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="productColorCode"
+                                    className="flex items-center gap-1"
+                                >
+                                    Màu <span className="text-destructive">*</span>
+                                </Label>
+                                <div className="select-dropdown-fix">
+                                    <Select
+                                        value={formData.productColorCode as string}
+                                        onValueChange={(value) =>
+                                            handleSelectChange("productColorCode", value)
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            className={
+                                                errors.productColorCode ? "border-destructive" : ""
+                                            }
+                                            disabled={isLoadingOptions}
+                                        >
+                                            <SelectValue
+                                                placeholder={
+                                                    isLoadingOptions ? "Đang tải..." : "Chọn màu"
+                                                }
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent position="popper" sideOffset={5}>
+                                            {colorCodeDataOptions &&
+                                            colorCodeDataOptions.length > 0 ? (
+                                                colorCodeDataOptions.map((color) => (
+                                                    <SelectItem
+                                                        key={color.value}
+                                                        value={color.value}
+                                                    >
+                                                        {color.label}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <SelectItem value="loading">Đang tải...</SelectItem>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {errors.productColorCode && (
+                                    <p className="text-xs text-destructive mt-1">
+                                        {errors.productColorCode}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Short Description - span 2 columns */}
+                        <div className="space-y-2 col-span-full">
+                            <Label htmlFor="productShortDetail" className="flex items-center gap-1">
+                                Mô tả <span className="text-destructive">*</span>
+                            </Label>
+                            <div
+                                className={
+                                    errors.productShortDetail
+                                        ? "border border-destructive rounded"
+                                        : ""
                                 }
-                                height="200px"
-                            />
+                            >
+                                <ClientSideCustomEditor
+                                    initialValue={formData.productShortDetail as string}
+                                    value={formData.productShortDetail as string}
+                                    onChange={(value) =>
+                                        handleEditorChange("productShortDetail", value)
+                                    }
+                                    height="200px"
+                                />
+                            </div>
+                            {errors.productShortDetail && (
+                                <p className="text-xs text-destructive mt-1">
+                                    {errors.productShortDetail}
+                                </p>
+                            )}
                         </div>
-                        {errors.productShortDetail && (
-                            <p className="text-xs text-destructive mt-1">
-                                {errors.productShortDetail}
-                            </p>
-                        )}
-                    </div>
 
-                    {/* Full Description - span 2 columns */}
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="productDetail" className="flex items-center gap-1">
-                            Mô tả chi tiết <span className="text-destructive">*</span>
-                        </Label>
-                        <div
-                            className={
-                                errors.productDetail ? "border border-destructive rounded" : ""
-                            }
-                        >
-                            <ClientSideCustomEditor
-                                initialValue={formData.productDetail as string}
-                                value={formData.productDetail as string}
-                                onChange={(value) => handleEditorChange("productDetail", value)}
-                                height="350px"
-                            />
+                        {/* Full Description - span 2 columns */}
+                        <div className="space-y-2 col-span-full">
+                            <Label htmlFor="productDetail" className="flex items-center gap-1">
+                                Mô tả chi tiết <span className="text-destructive">*</span>
+                            </Label>
+                            <div
+                                className={
+                                    errors.productDetail ? "border border-destructive rounded" : ""
+                                }
+                            >
+                                <ClientSideCustomEditor
+                                    initialValue={formData.productDetail as string}
+                                    value={formData.productDetail as string}
+                                    onChange={(value) => handleEditorChange("productDetail", value)}
+                                    height="300px"
+                                />
+                            </div>
+                            {errors.productDetail && (
+                                <p className="text-xs text-destructive mt-1">
+                                    {errors.productDetail}
+                                </p>
+                            )}
                         </div>
-                        {errors.productDetail && (
-                            <p className="text-xs text-destructive mt-1">{errors.productDetail}</p>
-                        )}
-                    </div>
 
-                    {/* Product Images - span 2 columns */}
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="productImages" className="flex items-center gap-1">
-                            Ảnh sản phẩm (Tối đa 5 ảnh) <span className="text-destructive">*</span>
-                        </Label>
-                        <div
-                            className={
-                                errors.uploadFiles ? "border border-destructive rounded" : ""
-                            }
-                        >
-                            <ProductFileUploader
-                                value={productImages}
-                                onChange={handleImagesChange}
-                            />
+                        {/* Product Images - span 2 columns */}
+                        <div className="space-y-2 col-span-full">
+                            <Label htmlFor="productImages" className="flex items-center gap-1">
+                                Ảnh sản phẩm (Tối đa 5 ảnh){" "}
+                                <span className="text-destructive">*</span>
+                            </Label>
+                            <div
+                                className={
+                                    errors.uploadFiles ? "border border-destructive rounded" : ""
+                                }
+                            >
+                                <ProductFileUploader
+                                    value={productImages}
+                                    onChange={handleImagesChange}
+                                />
+                            </div>
+                            {errors.uploadFiles && (
+                                <p className="text-xs text-destructive mt-1">
+                                    {errors.uploadFiles}
+                                </p>
+                            )}
                         </div>
-                        {errors.uploadFiles && (
-                            <p className="text-xs text-destructive mt-1">{errors.uploadFiles}</p>
-                        )}
                     </div>
-                </div>
+                </ScrollArea>
             )}
 
+            {/* Form Actions - Fixed at Bottom */}
             {!isLoadingProduct && (
-                <DialogFooter className="mt-6">
+                <DialogFooter className="mt-4 pt-4 border-t">
                     <Button type="button" variant="outline" onClick={onClose}>
                         Hủy
                     </Button>

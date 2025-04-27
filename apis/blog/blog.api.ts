@@ -14,4 +14,14 @@ export default {
     ): Promise<IApiResponse<IBlog>> {
         return apiService({ url: "/New/FindById", ...params });
     },
+    createOrUpdateBlogDetail(
+        params: IApiRequestParams<null, null, IBlog>
+    ): Promise<IApiResponse<IBlog>> {
+        return apiService({ method: "POST", url: "/New/CreateOrUpdate", ...params });
+    },
+    deleteBlog(
+        params: IApiRequestParams<null, { newId: number }, null>
+    ): Promise<IApiResponse<boolean>> {
+        return apiService({ method: "DELETE", url: "/New/Delete", ...params });
+    },
 };

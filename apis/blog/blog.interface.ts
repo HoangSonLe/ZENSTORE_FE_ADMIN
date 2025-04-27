@@ -9,5 +9,14 @@ export interface IBlog {
     newsShortContent: string;
     state: boolean;
     createdAt: string;
+    uploadFiles?: string[]; // For handling image uploads
 }
-export interface IBlogQuery extends IPagingQuery {}
+
+export interface IBlogCreateOrUpdate extends Omit<IBlog, "createdAt"> {
+    uploadFiles?: string[];
+}
+
+export interface IBlogQuery extends IPagingQuery {
+    keyword?: string;
+    state?: boolean;
+}

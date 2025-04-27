@@ -302,7 +302,7 @@ export default function ProductTable() {
 
             {/* Create Product Dialog */}
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogContent size="5xl" className="w-full max-w-[1200px]">
+                <DialogContent size="5xl" className="w-full max-w-[1200px] max-h-[90vh] p-6">
                     <DialogHeader>
                         <DialogTitle>Tạo mới</DialogTitle>
                     </DialogHeader>

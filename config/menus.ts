@@ -1094,12 +1094,12 @@ export const menusConfig = {
             {
                 title: "Sản phẩm",
                 icon: DashBoard,
-                href: "/products  ",
+                href: "/products",
             },
             {
-                title: "Tin tức",
-                icon: DashBoard,
-                href: "/dashboard",
+                title: "Bài viết",
+                icon: Note,
+                href: "/blogs",
             },
             {
                 title: "Banner",
