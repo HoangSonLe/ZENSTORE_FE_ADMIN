@@ -2,7 +2,7 @@
 
 import productApi from "@/apis/product/product.api";
 import categoryApi from "@/apis/category/category.api";
-import { IProduct, IProductQuery } from "@/apis/product/product.interface";
+import { IProduct, IProductCreateOrUpdate, IProductQuery } from "@/apis/product/product.interface";
 import { CommonTable } from "@/components/table/CommonTable";
 import { ActionButtons } from "@/components/table/action-buttons";
 import { DataTableColumnHeader } from "@/components/table/advanced/components/data-table-column-header";
@@ -28,7 +28,7 @@ import {
     BasicDialogTitle as DialogTitle,
 } from "@/components/ui/basic-dialog";
 import { PlusCircle } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import CreateProductDetail from "./components/create-product-detail";
 import UpdateProductDetail from "./components/update-product-detail";
 import { ISelectOption } from "@/apis/base/base.interface";
@@ -104,23 +104,13 @@ export default function ProductTable() {
             const response = await productApi.getProductList({
                 params: apiParams,
             });
-
-            console.log("API response:", response);
-            console.log("Total items:", response.data.total);
-            console.log("Page size:", response.data.pageSize);
-            console.log("Page number:", response.data.pageNumber);
-            console.log(
-                "Number of pages:",
-                Math.ceil(response.data.total / response.data.pageSize)
-            );
-
             return {
                 data: response.data.data,
                 total: response.data.total,
             };
         } catch (error) {
             console.error("Error fetching products:", error);
-            toast.error("Failed to load products");
+            toast.error("Tải dữ liệu sản phẩm lỗi");
             return {
                 data: [],
                 total: 0,
@@ -141,10 +131,10 @@ export default function ProductTable() {
             // Trigger a refresh of the table data
             setRefreshTrigger((prev) => prev + 1);
 
-            toast.success("Product deleted successfully");
+            toast.success("Xóa sản phẩm thành công");
         } catch (error) {
             console.error("Error deleting product:", error);
-            toast.error("Failed to delete product");
+            // toast.error("Lỗi xóa sản phẩm");
             throw error;
         }
     };
@@ -215,14 +205,7 @@ export default function ProductTable() {
             accessorKey: "productColorName",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Màu" />,
             cell: ({ row }) => {
-                // Define color mapping for color circles
-                const colorMapping: Record<string, string> = {
-                    BLACK: "#000",
-                    WHITE: "#fff",
-                    BROWN: "#8B4513",
-                    GRAY: "#808080",
-                };
-                return renderColor(row, "productColorName", "productColorCode", colorMapping);
+                return renderText(row, "productColorName");
             },
             size: 120,
         },
@@ -252,7 +235,7 @@ export default function ProductTable() {
                     row={row.original}
                     renderUpdateForm={(product, onClose) => (
                         <UpdateProductDetail
-                            product={product}
+                            product={product as IProductCreateOrUpdate}
                             onClose={onClose}
                             onSuccess={() => setRefreshTrigger((prev) => prev + 1)}
                         />
@@ -306,7 +289,6 @@ export default function ProductTable() {
         series: "seriCode",
         color: "colorCode",
     };
-
     return (
         <Fragment>
             {/* Create Product Button */}

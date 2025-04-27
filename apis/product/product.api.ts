@@ -1,6 +1,6 @@
 import { apiService } from "../axios";
 import { IApiRequestParams, IApiResponse, IApiResponseTable } from "../interface";
-import { IProduct, IProductQuery } from "./product.interface";
+import { IProduct, IProductCreateOrUpdate, IProductQuery } from "./product.interface";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
@@ -9,13 +9,13 @@ export default {
     ): Promise<IApiResponseTable<IProduct>> {
         return apiService({ url: "/Product/GetProductList", ...params });
     },
-    getProductDetail(
+    getProductDetailById(
         params: IApiRequestParams<null, { productId: number }, null>
     ): Promise<IApiResponse<IProduct>> {
         return apiService({ url: "/Product/FindById", ...params });
     },
     createOrUpdateProductDetail(
-        params: IApiRequestParams<null, IProduct, null>
+        params: IApiRequestParams<null, null, IProductCreateOrUpdate>
     ): Promise<IApiResponse<IProduct>> {
         return apiService({ method: "POST", url: "/Product/CreateorUpdate", ...params });
     },

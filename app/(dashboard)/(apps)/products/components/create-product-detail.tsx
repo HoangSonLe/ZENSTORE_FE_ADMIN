@@ -1,9 +1,9 @@
 "use client";
 
-import { IProduct } from "@/apis/product/product.interface";
+import productApi from "@/apis/product/product.api";
+import { IProductCreateOrUpdate } from "@/apis/product/product.interface";
 import { toast } from "react-hot-toast";
 import ProductDetail from "./product-detail";
-import productApi from "@/apis/product/product.api";
 
 interface CreateProductDetailProps {
     onClose: () => void;
@@ -11,14 +11,14 @@ interface CreateProductDetailProps {
 }
 
 export default function CreateProductDetail({ onClose, onSuccess }: CreateProductDetailProps) {
-    const handleCreateProduct = async (productData: Partial<IProduct>) => {
+    const handleCreateProduct = async (productData: IProductCreateOrUpdate) => {
         try {
             // Call the API to create or update the product
             await productApi.createOrUpdateProductDetail({
-                params: productData as IProduct,
+                body: productData,
             });
 
-            toast.success("Product created successfully");
+            toast.success("Sản phẩm đã được tạo thành công");
 
             // Call the onSuccess callback if provided
             if (onSuccess) {
@@ -26,8 +26,7 @@ export default function CreateProductDetail({ onClose, onSuccess }: CreateProduc
             }
         } catch (error) {
             console.error("Error creating product:", error);
-            toast.error("Failed to create product");
-            throw error;
+            toast.error("Lỗi tạo sản phẩm");
         }
     };
 
@@ -35,8 +34,8 @@ export default function CreateProductDetail({ onClose, onSuccess }: CreateProduc
         <ProductDetail
             onClose={onClose}
             onSubmit={handleCreateProduct}
-            submitButtonText="Create Product"
-            loadingText="Creating..."
+            submitButtonText="Tạo mới"
+            loadingText="Đang tạo..."
         />
     );
 }

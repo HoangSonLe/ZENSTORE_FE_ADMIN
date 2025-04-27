@@ -10,49 +10,42 @@ import { usePathname } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 const Providers = ({ children }: { children: React.ReactNode }) => {
-  const { theme, radius } = useThemeStore();
-  const location = usePathname();
+    const { theme, radius } = useThemeStore();
+    const location = usePathname();
 
-  if (location === "/") {
+    if (location === "/") {
+        return (
+            <body className={cn("dash-tail-app ", inter.className)}>
+                <ThemeProvider attribute="class" enableSystem={false} defaultTheme="light">
+                    <div className={cn("h-full  ")}>
+                        {children}
+                        <ReactToaster />
+                    </div>
+                    <Toaster />
+                    <SonnToaster position="top-right" />
+                </ThemeProvider>
+            </body>
+        );
+    }
     return (
-      <body className={cn("dash-tail-app ", inter.className)}>
-        <ThemeProvider
-          attribute="class"
-          enableSystem={false}
-          defaultTheme="light"
+        <body
+            className={cn("dash-tail-app ", inter.className, "theme-" + theme)}
+            style={
+                {
+                    "--radius": `${radius}rem`,
+                } as React.CSSProperties
+            }
         >
-          <div className={cn("h-full  ")}>
-            {children}
-            <ReactToaster />
-          </div>
-          <Toaster />
-          <SonnToaster />
-        </ThemeProvider>
-      </body>
+            <ThemeProvider attribute="class" enableSystem={false} defaultTheme="light">
+                <div className={cn("h-full  ")}>
+                    {children}
+                    <ReactToaster />
+                </div>
+                <Toaster />
+                <SonnToaster position="top-right" />
+            </ThemeProvider>
+        </body>
     );
-  }
-  return (
-    <body
-      className={cn("dash-tail-app ", inter.className, "theme-" + theme)}
-      style={{
-        "--radius": `${radius}rem`,
-      } as React.CSSProperties
-      }
-    >
-      <ThemeProvider
-        attribute="class"
-        enableSystem={false}
-        defaultTheme="light"
-      >
-        <div className={cn("h-full  ")}>
-          {children}
-          <ReactToaster />
-        </div>
-        <Toaster />
-        <SonnToaster />
-      </ThemeProvider>
-    </body>
-  );
 };
 
 export default Providers;

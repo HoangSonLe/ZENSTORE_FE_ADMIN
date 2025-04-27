@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 // Dialog variants for sizing
 const dialogVariants = cva(
-    "fixed left-1/2 top-1/2 z-[999] grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 bg-background p-6 shadow-lg duration-200 rounded-lg grid gap-4",
+    "fixed left-1/2 top-1/2 z-[9999] grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 bg-background p-6 shadow-lg duration-200 rounded-lg grid gap-4",
     {
         variants: {
             size: {
@@ -134,14 +134,18 @@ const BasicDialogContent = React.forwardRef<HTMLDivElement, BasicDialogContentPr
                 {/* Backdrop/Overlay */}
                 <div
                     className={cn(
-                        "fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm",
+                        "fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm",
                         overlayClass
                     )}
                     onClick={() => setOpen(false)}
                 />
 
                 {/* Dialog Content */}
-                <div ref={ref} className={cn(dialogVariants({ size }), className)} {...props}>
+                <div
+                    ref={ref}
+                    className={cn(dialogVariants({ size }), "dialog-content", className)}
+                    {...props}
+                >
                     {children}
                     {!hiddenCloseIcon && (
                         <button

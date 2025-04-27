@@ -14,17 +14,32 @@ export function renderImage<T>(
     accessorKey: string,
     altAccessorKey?: string,
     width: number = 12,
-    height: number = 12,
-    placeholderUrl: string = "/images/placeholder.png"
+    height: number = 12
+    // Removed unused placeholderUrl parameter
 ) {
     try {
         const images = row.getValue(accessorKey);
-        let imageUrl = placeholderUrl;
+        let imageUrl = "";
 
         if (Array.isArray(images) && images.length > 0) {
             imageUrl = images[0];
         } else if (typeof images === "string") {
             imageUrl = images;
+        }
+
+        // If no valid image URL is found, don't attempt to load an image
+        if (!imageUrl || imageUrl.trim() === "") {
+            return (
+                <div className="flex justify-center items-center">
+                    <div
+                        className={`w-${width} h-${height} relative rounded-md overflow-hidden bg-gray-100`}
+                    >
+                        <div className="flex items-center justify-center h-full text-gray-400">
+                            N/A
+                        </div>
+                    </div>
+                </div>
+            );
         }
 
         const alt = altAccessorKey ? String(row.getValue(altAccessorKey) || "Image") : "Image";
@@ -39,7 +54,20 @@ export function renderImage<T>(
                         alt={alt}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                            e.currentTarget.src = placeholderUrl;
+                            // Replace the img element with a div containing "N/A"
+                            const imgElement = e.currentTarget;
+                            const parentElement = imgElement.parentElement;
+
+                            if (parentElement) {
+                                // Create a div with "N/A" text
+                                const fallbackDiv = document.createElement("div");
+                                fallbackDiv.className =
+                                    "flex items-center justify-center h-full text-gray-400";
+                                fallbackDiv.textContent = "N/A";
+
+                                // Replace the img with the div
+                                parentElement.replaceChild(fallbackDiv, imgElement);
+                            }
                         }}
                     />
                 </div>

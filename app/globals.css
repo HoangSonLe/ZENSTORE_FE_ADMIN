@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ensure select dropdowns appear above dialogs */
+[data-radix-popper-content-wrapper] {
+    z-index: 99999 !important;
+}
+
+/* Fix for Radix UI Select components inside dialogs */
+.select-dropdown-fix [data-radix-select-viewport] {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Ensure the select trigger is clickable */
+.select-dropdown-fix {
+    position: relative;
+    z-index: 10;
+}
+
+/* Fix for select components inside dialogs */
+.dialog-content .select-dropdown-fix {
+    position: relative;
+    z-index: 10000;
+}
+
+/* Table responsive styles */
+@layer components {
+    /* Improve table scrolling behavior */
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure table cells handle overflow properly */
+    .table-cell-content {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Responsive height for table container */
+    @media (max-height: 768px) {
+        .table-responsive-height {
+            max-height: 60vh;
+        }
+    }
+
+    @media (min-height: 769px) {
+        .table-responsive-height {
+            max-height: 70vh;
+        }
+    }
+
+    /* Pagination styles */
+    .pagination-select [data-radix-popper-content-wrapper] {
+        z-index: 99999 !important;
+    }
+
+    /* Ensure page number buttons have consistent size */
+    .pagination-page-button {
+        min-width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ClientSideCustomEditor from "@/components/ui/CKEditor/TinyMCE/ClientSideCustomEditor";
+import ClientSideCustomEditor from "@/components/ui/TinyMCE/ClientSideCustomEditor";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -21,7 +21,7 @@ export default function CKEditorTestPage() {
         <div className="container mx-auto p-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>CKEditor (No API Key Required)</CardTitle>
+                    <CardTitle>TinyMCE Editor (No API Key Required)</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="mb-6">

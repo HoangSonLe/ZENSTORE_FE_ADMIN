@@ -152,7 +152,7 @@ export function DataTable<TData>({
     }, [JSON.stringify(table.getState().sorting)]);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full overflow-hidden">
             <DataTableToolbar
                 table={table}
                 onReload={onReload}
@@ -163,7 +163,7 @@ export function DataTable<TData>({
                 filters={filters}
             />
 
-            <div className="rounded-md border border-border relative">
+            <div className="rounded-md border border-border relative w-full overflow-hidden">
                 {/* Loading overlay */}
                 {isLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm z-20">
@@ -174,15 +174,18 @@ export function DataTable<TData>({
                     </div>
                 )}
 
-                {/* New synchronized scrolling implementation */}
-                <div
-                    className="relative"
-                    style={{ height: `${Math.min(pageSize * 41 + 60, 550)}px`, minHeight: "400px" }}
-                >
+                {/* Improved table container with better scrolling */}
+                <div className="relative table-responsive-height w-full">
                     {/* Create a container with both horizontal and vertical scrolling */}
-                    <div className="overflow-x-auto overflow-y-auto h-full">
-                        {/* Table container with fixed width columns */}
-                        <table className="w-full border-collapse table-fixed">
+                    <div
+                        className="overflow-auto table-responsive-height w-full table-container"
+                        style={{
+                            height: `${Math.min(pageSize * 41 + 60, 550)}px`,
+                            minHeight: "400px",
+                        }}
+                    >
+                        {/* Table with auto layout for better content handling */}
+                        <table className="w-full border-collapse min-w-full">
                             {/* Table Header */}
                             <thead className="sticky top-0 z-10 bg-background border-b border-border">
                                 {table.getHeaderGroups().map((headerGroup) => (
@@ -191,11 +194,13 @@ export function DataTable<TData>({
                                             <th
                                                 key={header.id}
                                                 colSpan={header.colSpan}
-                                                className="h-14 px-4 text-left align-middle font-semibold text-sm text-foreground capitalize"
+                                                className="h-14 px-4 text-left align-middle font-semibold text-sm text-foreground capitalize whitespace-nowrap"
                                                 style={{
                                                     width: header.column.getSize(),
-                                                    minWidth: header.column.getSize(),
-                                                    maxWidth: header.column.getSize(),
+                                                    minWidth:
+                                                        header.column.getSize() > 100
+                                                            ? header.column.getSize()
+                                                            : 100,
                                                 }}
                                             >
                                                 {header.isPlaceholder
@@ -223,11 +228,14 @@ export function DataTable<TData>({
                                                 {row.getVisibleCells().map((cell) => (
                                                     <td
                                                         key={cell.id}
-                                                        className="p-4 align-middle text-sm text-foreground/80 font-normal"
+                                                        className="p-4 align-middle text-sm text-foreground/80 font-normal table-cell-content"
                                                         style={{
                                                             width: cell.column.getSize(),
-                                                            minWidth: cell.column.getSize(),
-                                                            maxWidth: cell.column.getSize(),
+                                                            minWidth:
+                                                                cell.column.getSize() > 100
+                                                                    ? cell.column.getSize()
+                                                                    : 100,
+                                                            maxWidth: "none",
                                                         }}
                                                     >
                                                         {flexRender(
@@ -254,7 +262,6 @@ export function DataTable<TData>({
                                                     <td
                                                         colSpan={columns.length}
                                                         className="h-10 border-none bg-transparent"
-                                                        style={{ borderBottom: "none" }}
                                                     ></td>
                                                 </tr>
                                             ))}
@@ -264,10 +271,10 @@ export function DataTable<TData>({
                                         <tr>
                                             <td
                                                 colSpan={columns.length}
-                                                className="h-40 text-center align-middle"
+                                                className="h-20 text-center align-middle"
                                             >
-                                                <div className="flex flex-col items-center justify-center w-full">
-                                                    <p className="text-lg font-medium text-muted-foreground text-center w-full">
+                                                <div className="flex flex-col items-center justify-center w-full py-4">
+                                                    <p className="text-lg font-medium text-muted-foreground text-center">
                                                         No results.
                                                     </p>
                                                 </div>

@@ -12,7 +12,7 @@ interface DeleteButtonProps {
 
 export function DeleteButton({
     onDelete,
-    toastMessage = "Item deleted successfully",
+    toastMessage = "Xóa thành công",
     disabled = false,
 }: DeleteButtonProps) {
     return (
@@ -20,6 +20,7 @@ export function DeleteButton({
             onConfirm={onDelete}
             toastMessage={toastMessage}
             disabled={disabled}
+            defaultToast={false}
         >
             <Button
                 variant="ghost"

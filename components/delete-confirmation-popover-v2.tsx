@@ -15,7 +15,7 @@ interface DeleteConfirmationPopoverProps {
 const DeleteConfirmationPopoverV2: React.FC<DeleteConfirmationPopoverProps> = ({
     onConfirm,
     defaultToast = true,
-    toastMessage = "Successfully deleted",
+    toastMessage = "Xóa thành công",
     children,
     disabled = false,
 }) => {
@@ -46,24 +46,26 @@ const DeleteConfirmationPopoverV2: React.FC<DeleteConfirmationPopoverProps> = ({
         };
     }, [isOpen]);
 
-    const handleConfirm = async () => {
-        try {
-            startTransition(async () => {
+    const handleConfirm = () => {
+        startTransition(async () => {
+            try {
                 await onConfirm();
                 if (defaultToast) {
                     toast.success(toastMessage, {
                         position: "top-right",
                     });
                 }
+            } catch (error) {
+                console.error("Error during deletion:", error);
+                if (defaultToast) {
+                    toast.error("Xóa lỗi", {
+                        position: "top-right",
+                    });
+                }
+            } finally {
                 setIsOpen(false);
-            });
-        } catch (error) {
-            console.error("Error during deletion:", error);
-            toast.error("Failed to delete item", {
-                position: "top-right",
-            });
-            setIsOpen(false);
-        }
+            }
+        });
     };
 
     const handleTriggerClick = (e: React.MouseEvent) => {

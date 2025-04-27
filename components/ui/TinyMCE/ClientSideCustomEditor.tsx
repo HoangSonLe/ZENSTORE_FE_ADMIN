@@ -2,9 +2,9 @@
 "use client"; // Required only in App Router.
 
 import dynamic from "next/dynamic";
-import { UncontrolledEditorProps } from "@/components/ui/CKEditor/TinyMCE/UncontrolledEditor";
+import { UncontrolledEditorProps } from "@/components/ui/TinyMCE/UncontrolledEditor";
 
-const DynamicEditor = dynamic(() => import("@/components/ui/CKEditor/TinyMCE/UncontrolledEditor"), {
+const DynamicEditor = dynamic(() => import("@/components/ui/TinyMCE/UncontrolledEditor"), {
     ssr: false,
 });
 

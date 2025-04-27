@@ -78,7 +78,7 @@ const DialogContent = React.forwardRef<
             <DialogOverlay className={overlayClass} />
             <DialogPrimitive.Content
                 ref={ref}
-                className={cn(dialogVariants({ size }), className)}
+                className={cn(dialogVariants({ size }), "dialog-content", className)}
                 {...props}
             >
                 {children}

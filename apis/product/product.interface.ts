@@ -12,14 +12,17 @@ export interface IProduct {
     productSeriesName: string;
     productColorCode: string;
     productColorName: string;
-    productPrice: number;
-    productPriceSale: number;
+    productPrice: string;
+    productPriceSale: string;
     productImage: string;
     listImage: string[];
     productShortDetail: string;
     productDetail: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+export interface IProductCreateOrUpdate extends IProduct {
+    uploadFiles: string[];
 }
 export interface IProductQuery extends IPagingQuery {
     seriCode?: string;

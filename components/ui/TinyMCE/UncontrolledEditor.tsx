@@ -1,16 +1,11 @@
 "use client";
-// TinyMCE so the global var exists
+
+// Import all TinyMCE dependencies
 import "tinymce/tinymce";
-// DOM model
 import "tinymce/models/dom/model";
-// Theme
 import "tinymce/themes/silver";
-// Toolbar icons
 import "tinymce/icons/default";
-// Editor styles
 import "tinymce/skins/ui/oxide/skin";
-// importing the plugin js.
-// if you use a plugin that is not listed here the editor will fail to load
 import "tinymce/plugins/advlist";
 import "tinymce/plugins/anchor";
 import "tinymce/plugins/autolink";
@@ -40,65 +35,56 @@ import "tinymce/plugins/table";
 import "tinymce/plugins/visualblocks";
 import "tinymce/plugins/visualchars";
 import "tinymce/plugins/wordcount";
-// importing plugin resources
 import "tinymce/plugins/emoticons/js/emojis";
-// Content styles, including inline UI like fake cursors
 import "tinymce/skins/content/default/content";
 import "tinymce/skins/ui/oxide/content";
 
 import { Editor } from "@tinymce/tinymce-react";
 import { forwardRef, memo, useEffect, useImperativeHandle, useRef } from "react";
 
-// Define the methods you want to expose to the parent
-export interface CKEditorRef {
+export interface UncontrolledEditorRef {
     getContent: () => string;
     setContent: (content: string) => void;
 }
 
-export interface CKEditorProps {
-    initialValue?: string | undefined;
-    value?: string | undefined;
+export interface UncontrolledEditorProps {
+    initialValue?: string;
+    value?: string;
     morePlugins?: string[];
     height?: string;
     onChange: (content: string) => void;
 }
 
-const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
-    ({ initialValue, value, height, morePlugins, onChange }, ref) => {
+/**
+ * An uncontrolled TinyMCE editor component that preserves cursor position
+ * by avoiding React's controlled component pattern.
+ */
+const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorProps>(
+    ({ initialValue = "", value, height, morePlugins = [], onChange }, ref) => {
         const editorRef = useRef<any>(null);
-        const skipNextChangeRef = useRef(false);
-        const contentRef = useRef(initialValue || value || "");
+        const initialContentRef = useRef(initialValue || value || "");
         const isInitializedRef = useRef(false);
 
         // Expose methods to parent using useImperativeHandle
         useImperativeHandle(ref, () => ({
             getContent: () => {
-                return editorRef.current ? editorRef.current.getContent() : contentRef.current;
+                return editorRef.current
+                    ? editorRef.current.getContent()
+                    : initialContentRef.current;
             },
             setContent: (content: string) => {
-                if (editorRef.current && content !== editorRef.current.getContent()) {
-                    skipNextChangeRef.current = true;
+                if (editorRef.current) {
                     editorRef.current.setContent(content);
-                    contentRef.current = content;
                 }
             },
         }));
 
-        // Handle external value changes
+        // Use initialValue or value, with initialValue taking precedence
         useEffect(() => {
-            // Skip during initial render
             if (!isInitializedRef.current) {
-                return;
+                initialContentRef.current = initialValue || value || "";
             }
-
-            // Only update if the editor exists and the value is different from current content
-            if (editorRef.current && value !== undefined && value !== contentRef.current) {
-                // Skip the next onChange event to prevent cursor jumping
-                skipNextChangeRef.current = true;
-                editorRef.current.setContent(value);
-                contentRef.current = value;
-            }
-        }, [value]);
+        }, [initialValue, value]);
 
         const toolbar =
             "accordion accordionremove | blocks fontfamily fontsize | " +
@@ -132,7 +118,6 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
             "pagebreak",
             "nonbreaking",
             "insertdatetime",
-            // 'quickbars',
             "emoticons",
             ...(morePlugins ?? []),
         ];
@@ -143,17 +128,7 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
         }, []);
 
         // Custom onChange handler to prevent cursor jumping
-        const handleEditorChange = (content: string, editor: any) => {
-            // If this change was triggered by an external update, skip the onChange callback
-            if (skipNextChangeRef.current) {
-                skipNextChangeRef.current = false;
-                return;
-            }
-
-            // Update our content ref
-            contentRef.current = content;
-
-            // Call the onChange prop
+        const handleEditorChange = (content: string) => {
             onChange(content);
         };
 
@@ -163,7 +138,7 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
                     editorRef.current = editor;
                     isInitializedRef.current = true;
                 }}
-                initialValue={initialValue || value || ""}
+                initialValue={initialContentRef.current}
                 init={{
                     height: height ?? 500,
                     menubar: false,
@@ -208,4 +183,6 @@ const CKEditor = forwardRef<CKEditorRef, CKEditorProps>(
     }
 );
 
-export default memo(CKEditor);
+UncontrolledEditor.displayName = "UncontrolledEditor";
+
+export default memo(UncontrolledEditor);

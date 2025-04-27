@@ -26,6 +26,7 @@ axiosInstance.interceptors.request.use(
 
 const handleErrorResponse = (response: AxiosResponse<any, any>) => {
     try {
+        console.log(response);
         const errorMessage = response.statusText;
 
         if (errorMessage) {
@@ -47,6 +48,7 @@ const handleSuccessResponse = (response: AxiosResponse<any, any>) => {
             return response.data;
         } else if (responseCast.isSuccess === false) {
             responseCast.errorMessageList.forEach((msg) => stoast.error(msg));
+            return Promise.reject(response);
         }
         return response;
     } catch (error) {

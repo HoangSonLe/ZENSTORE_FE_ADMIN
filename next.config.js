@@ -59,7 +59,7 @@ const nextConfig = {
 
         return config;
     },
-    // Keep your existing images config
+    // Updated images config with unoptimized option
     images: {
         remotePatterns: [
             {
@@ -78,7 +78,13 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "avatars.githubusercontent.com",
             },
+            {
+                protocol: "https",
+                hostname: "10.0.0.11",
+            },
         ],
+        // Set unoptimized to true only in development mode
+        unoptimized: process.env.NODE_ENV === "development",
     },
 };
 

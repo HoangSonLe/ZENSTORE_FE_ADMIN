@@ -1,12 +1,12 @@
 "use client";
 
-import { IProduct } from "@/apis/product/product.interface";
+import productApi from "@/apis/product/product.api";
+import { IProductCreateOrUpdate } from "@/apis/product/product.interface";
 import { toast } from "react-hot-toast";
 import ProductDetail from "./product-detail";
-import productApi from "@/apis/product/product.api";
 
 interface UpdateProductDetailProps {
-    product: IProduct;
+    product: IProductCreateOrUpdate;
     onClose: () => void;
     onSuccess?: () => void;
 }
@@ -16,20 +16,20 @@ export default function UpdateProductDetail({
     onClose,
     onSuccess,
 }: UpdateProductDetailProps) {
-    const handleUpdateProduct = async (productData: Partial<IProduct>) => {
+    const handleUpdateProduct = async (productData: IProductCreateOrUpdate) => {
         try {
             // Merge the existing product with the updated data
-            const updatedProduct: IProduct = {
+            const updatedProduct: IProductCreateOrUpdate = {
                 ...product,
                 ...productData,
             };
 
             // Call the API to create or update the product
             await productApi.createOrUpdateProductDetail({
-                params: updatedProduct,
+                body: updatedProduct,
             });
 
-            toast.success("Product updated successfully");
+            toast.success("Sản phẩm đã được lưu thành công");
 
             // Call the onSuccess callback if provided
             if (onSuccess) {
@@ -37,18 +37,19 @@ export default function UpdateProductDetail({
             }
         } catch (error) {
             console.error("Error updating product:", error);
-            toast.error("Failed to update product");
+            toast.error("Lỗi lưu sản phẩm");
             throw error;
         }
     };
 
     return (
         <ProductDetail
+            productId={product.productId}
             initialData={product}
             onClose={onClose}
             onSubmit={handleUpdateProduct}
-            submitButtonText="Save Changes"
-            loadingText="Saving..."
+            submitButtonText="Lưu thay đổi"
+            loadingText="Đang lưu..."
         />
     );
 }

@@ -44,18 +44,16 @@ export function ActionButtons<T>({
             <EditButton onClick={handleUpdate} />
 
             {/* Delete Button */}
-            {onDelete && (
-                <DeleteButton onDelete={handleDelete} toastMessage="Item deleted successfully" />
-            )}
+            {onDelete && <DeleteButton onDelete={handleDelete} toastMessage="Xóa thành công" />}
 
             {/* Update Dialog */}
             {renderUpdateForm && (
                 <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
                     <DialogContent size="5xl" className="w-full max-w-[1200px]">
                         <DialogHeader>
-                            <DialogTitle>Edit Product</DialogTitle>
+                            <DialogTitle>Chỉnh sửa</DialogTitle>
                             <DialogDescription>
-                                Update product information. Fields marked with * are required.
+                                Cập nhật thông tin sản phẩm. Các trường có dấu * là bắt buộc.
                             </DialogDescription>
                         </DialogHeader>
                         {renderUpdateForm(row, () => setShowUpdateDialog(false))}

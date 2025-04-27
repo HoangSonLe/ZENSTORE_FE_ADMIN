@@ -38,8 +38,8 @@ const ProductFileUploader = ({ value, onChange }: ProductFileUploaderProps) => {
         onDropRejected: () => {
             toast({
                 variant: "destructive",
-                title: "Error",
-                description: "You can only upload 5 image files & maximum size of 5 MB each",
+                title: "Lỗi",
+                description: "Bạn chỉ có thể upload tối đa 5 ảnh. Mỗi ảnh tối đa 5MB",
             });
         },
     });
@@ -53,6 +53,7 @@ const ProductFileUploader = ({ value, onChange }: ProductFileUploaderProps) => {
                     alt={file.name}
                     src={file.preview}
                     className="rounded border p-0.5 object-cover"
+                    unoptimized={true}
                 />
             );
         } else {
@@ -109,10 +110,10 @@ const ProductFileUploader = ({ value, onChange }: ProductFileUploaderProps) => {
                         <Upload className="h-6 w-6 text-default-500" />
                     </div>
                     <h4 className="text-base font-medium mb-1 text-card-foreground/80">
-                        Drop product images here or click to upload
+                        Thả ảnh tại đây hoặc nhấp chuột để upload ảnh
                     </h4>
                     <div className="text-xs text-muted-foreground">
-                        (Maximum 5 images, 5MB each)
+                        (Tối đa 5 images kích thước tối đa 5MB mỗi ảnh)
                     </div>
                 </div>
             </div>
@@ -126,7 +127,7 @@ const ProductFileUploader = ({ value, onChange }: ProductFileUploaderProps) => {
                                 color="destructive"
                                 onClick={handleRemoveAllFiles}
                             >
-                                Remove All
+                                Xóa tất cả
                             </Button>
                         </div>
                     )}
