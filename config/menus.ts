@@ -1103,8 +1103,9 @@ export const menusConfig = {
             },
             {
                 title: "Banner",
-                icon: DashBoard,
-                href: "/dashboard",
+                // icon: Image,
+                icon: Note,
+                href: "/banners",
             },
         ],
     },

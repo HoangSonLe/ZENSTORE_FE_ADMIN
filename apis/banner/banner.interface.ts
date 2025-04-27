@@ -12,3 +12,7 @@ export interface IBanner {
     createdAt: string; // or Date if you parse it
     updatedAt: string; // or Date if you parse it
 }
+export interface IBannerBody {
+    bannerId: number;
+    bannerImage: string;
+}
