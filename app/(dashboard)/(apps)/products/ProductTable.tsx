@@ -87,7 +87,7 @@ export default function ProductTable() {
 
     // Function to fetch products from the API
     const fetchProducts = async (params: IProductQuery) => {
-        console.log("Fetching products with params:", params);
+        // console.log("Fetching products with params:", params);
 
         try {
             // Map the parameters to match what the API expects
@@ -98,7 +98,7 @@ export default function ProductTable() {
                 // Keep pageNumber for backward compatibility
             };
 
-            console.log("Mapped API params:", apiParams);
+            // console.log("Mapped API params:", apiParams);
 
             // Call the real API
             const response = await productApi.getProductList({
@@ -121,8 +121,6 @@ export default function ProductTable() {
     // Handler for deleting a product
     const handleDeleteProduct = async (product: IProduct) => {
         try {
-            console.log("Deleting product:", product);
-
             // Call the API to delete the product
             await productApi.deleteProductById({
                 params: { productId: product.productId },

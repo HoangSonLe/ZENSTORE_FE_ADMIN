@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Upload, X, FileText } from "lucide-react";
+import { toast } from "sonner";
 
 interface FileWithPreview extends File {
     preview: string;
@@ -17,7 +18,6 @@ interface ProductFileUploaderProps {
 
 const ProductFileUploader = ({ value, onChange }: ProductFileUploaderProps) => {
     const [files, setFiles] = useState<FileWithPreview[]>(value || []);
-    const { toast } = useToast();
     const { getRootProps, getInputProps } = useDropzone({
         maxFiles: 5,
         maxSize: 5000000, // 5MB
@@ -36,11 +36,7 @@ const ProductFileUploader = ({ value, onChange }: ProductFileUploaderProps) => {
             onChange(updatedFiles);
         },
         onDropRejected: () => {
-            toast({
-                variant: "destructive",
-                title: "Lỗi",
-                description: "Bạn chỉ có thể upload tối đa 5 ảnh. Mỗi ảnh tối đa 5MB",
-            });
+            toast.error("Bạn chỉ có thể upload tối đa 5 ảnh. Mỗi ảnh tối đa 5 MB");
         },
     });
 
@@ -74,12 +70,11 @@ const ProductFileUploader = ({ value, onChange }: ProductFileUploaderProps) => {
                 <div>
                     <div className="text-sm text-card-foreground">{file.name}</div>
                     <div className="text-xs font-light text-muted-foreground">
-                        {Math.round(file.size / 100) / 10 > 1000 ? (
-                            <>{(Math.round(file.size / 100) / 10000).toFixed(1)}</>
+                        {file.size > 1024 * 1024 ? (
+                            <>{(file.size / (1024 * 1024)).toFixed(1)} MB</>
                         ) : (
-                            <>{(Math.round(file.size / 100) / 10).toFixed(1)}</>
+                            <>{(file.size / 1024).toFixed(1)} KB</>
                         )}
-                        {" MB"}
                     </div>
                 </div>
             </div>
@@ -113,7 +108,7 @@ const ProductFileUploader = ({ value, onChange }: ProductFileUploaderProps) => {
                         Thả ảnh tại đây hoặc nhấp chuột để upload ảnh
                     </h4>
                     <div className="text-xs text-muted-foreground">
-                        (Tối đa 5 images kích thước tối đa 5MB mỗi ảnh)
+                        (Tối đa 5 images kích thước tối đa 5 MB mỗi ảnh)
                     </div>
                 </div>
             </div>

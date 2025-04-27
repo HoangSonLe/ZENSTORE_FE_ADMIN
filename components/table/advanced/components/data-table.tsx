@@ -53,6 +53,7 @@ interface DataTableProps<TData> {
     searchText?: string;
     onSearchChange?: (value: string) => void;
     onSearchSubmit?: () => void;
+    onResetSearch?: () => void; // New prop for explicitly resetting search
     filters?: {
         [key: string]: FilterConfig;
     };
@@ -68,6 +69,7 @@ export function DataTable<TData>({
     searchText = "",
     onSearchChange,
     onSearchSubmit,
+    onResetSearch,
     filters,
 }: DataTableProps<TData>) {
     const [rowSelection, setRowSelection] = React.useState({});
@@ -159,6 +161,7 @@ export function DataTable<TData>({
                 searchText={searchText}
                 onSearchChange={onSearchChange}
                 onSearchSubmit={onSearchSubmit}
+                onResetSearch={onResetSearch}
                 showGlobalFilter={!!onSearchChange}
                 filters={filters}
             />
@@ -275,7 +278,7 @@ export function DataTable<TData>({
                                             >
                                                 <div className="flex flex-col items-center justify-center w-full py-4">
                                                     <p className="text-lg font-medium text-muted-foreground text-center">
-                                                        No results.
+                                                        Không có kết quả
                                                     </p>
                                                 </div>
                                             </td>

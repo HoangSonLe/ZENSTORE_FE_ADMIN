@@ -28,6 +28,7 @@ interface DataTableToolbarProps {
     searchText?: string;
     onSearchChange?: (value: string) => void;
     onSearchSubmit?: () => void;
+    onResetSearch?: () => void; // New prop for explicitly resetting search
     showGlobalFilter?: boolean;
     filters?: {
         [key: string]: FilterConfig;
@@ -40,6 +41,7 @@ export function DataTableToolbar({
     searchText = "",
     onSearchChange,
     onSearchSubmit,
+    onResetSearch,
     showGlobalFilter = false,
     filters,
 }: DataTableToolbarProps) {
@@ -68,27 +70,53 @@ export function DataTableToolbar({
 
     // Reset all filters
     const resetAllFilters = () => {
-        // Reset all filters
-        if (filters) {
-            Object.entries(filters).forEach(([key, config]) => {
-                // Use empty array for multi-select filters or status filter, empty string for single-select
-                const emptyValue = config.multi || key === "status" ? [] : "";
-                config.onChange(emptyValue);
-            });
-        }
+        console.log("Resetting all filters");
 
-        // Reset search text if applicable
-        if (onSearchChange) {
+        // Use a more controlled approach to prevent race conditions
+        // and DOM manipulation issues
+
+        // Step 1: Reset table column filters
+        table.resetColumnFilters();
+
+        // Step 2: Reset search text if applicable
+        if (onResetSearch) {
+            console.log("Using explicit onResetSearch function");
+            // Use the dedicated function to reset search
+            onResetSearch();
+        } else if (onSearchChange) {
+            console.log("Resetting search text using fallback method");
+            // First, clear the search input field
             onSearchChange("");
 
-            // Also submit the empty search to update searchQuery
+            // Then, make sure to submit the empty search to update searchQuery
             if (onSearchSubmit) {
+                console.log("Submitting empty search");
                 onSearchSubmit();
             }
         }
 
-        // Reset table column filters
-        table.resetColumnFilters();
+        // Step 3: Reset all custom filters
+        if (filters) {
+            // Process filters one by one to avoid batch updates that might cause issues
+            Object.entries(filters).forEach(([key, config]) => {
+                try {
+                    // Use empty array for multi-select filters or status filter, empty string for single-select
+                    const emptyValue = config.multi || key === "status" ? [] : "";
+                    config.onChange(emptyValue);
+                } catch (error) {
+                    console.error(`Error resetting filter ${key}:`, error);
+                }
+            });
+        }
+
+        // Step 4: Force a reload after a small delay to ensure all state updates have been processed
+        // This helps prevent DOM manipulation issues
+        if (onReload) {
+            // Use requestAnimationFrame to ensure DOM updates have completed
+            requestAnimationFrame(() => {
+                onReload();
+            });
+        }
     };
 
     return (
@@ -149,7 +177,12 @@ export function DataTableToolbar({
                 ))}
 
             {/* Reset filters button */}
-            {(isFiltered || (filters && Object.values(filters).some((f) => f.value))) && (
+            {(isFiltered ||
+                (filters &&
+                    Object.values(filters).some((f) =>
+                        Array.isArray(f.value) ? f.value.length > 0 : f.value !== ""
+                    )) ||
+                (searchText && searchText !== "")) && (
                 <Button variant="outline" onClick={resetAllFilters} className="h-8 px-2 lg:px-3">
                     Xóa lọc
                     <X className="ltr:ml-2 rtl:mr-2 h-4 w-4" />
@@ -173,7 +206,7 @@ export function DataTableToolbar({
                         Tải lại
                     </Button>
                 )}
-                <DataTableViewOptions table={table} />
+                {/* <DataTableViewOptions table={table} /> */}
             </div>
         </div>
     );

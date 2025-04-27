@@ -109,11 +109,15 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
                 }
             }
 
+            // Create a safe copy of the search query to prevent any issues
+            const safeSearchQuery = typeof searchQuery === "string" ? searchQuery.trim() : "";
+
             // Prepare query parameters
             const queryParams = {
                 pageNumber: pagination.pageNumber,
                 pageSize: pagination.pageSize,
-                searchString: searchQuery,
+                // Only include searchString if it's not empty and not just whitespace
+                ...(safeSearchQuery !== "" ? { searchString: safeSearchQuery } : {}),
                 sorter: sortParam,
                 // Add these mappings for APIs that expect different parameter names
                 current: pagination.pageNumber, // Some APIs expect 'current' instead of 'pageNumber'
@@ -131,9 +135,6 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
                     return acc;
                 }, {} as Record<string, any>),
             } as Q;
-
-            // Log the request parameters
-            console.log("Fetching data with params:", queryParams);
 
             // Call the provided fetchData function
             const response = await fetchData(queryParams);
@@ -191,9 +192,17 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
         };
     }, []); // Empty dependency array means this runs once on mount
 
-    // Effect for pagination changes
+    // Use refs to track what triggered the data fetch
     const isFirstRenderRef = useRef(true);
+    const lastPaginationRef = useRef({
+        pageNumber: pagination.pageNumber,
+        pageSize: pagination.pageSize,
+    });
+    const lastSortingRef = useRef(JSON.stringify(sorting));
+    const lastFiltersRef = useRef(JSON.stringify(filters));
+    const lastSearchRef = useRef(searchQuery);
 
+    // Combined effect for all data fetching triggers
     useEffect(() => {
         // Skip the first render to avoid double fetching
         if (isFirstRenderRef.current) {
@@ -201,39 +210,50 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
             return;
         }
 
-        console.log("Pagination changed, fetching data:", pagination);
-        // Fetch data immediately for pagination changes (no debounce)
-        fetchTableData();
-    }, [pagination.pageNumber, pagination.pageSize, fetchTableData]);
+        // Determine what changed to trigger this effect
+        const paginationChanged =
+            lastPaginationRef.current.pageNumber !== pagination.pageNumber ||
+            lastPaginationRef.current.pageSize !== pagination.pageSize;
 
-    // Effect for sorting changes
-    useEffect(() => {
-        // Don't fetch if sorting is empty
-        if (sorting.length === 0) {
-            return;
-        }
+        const sortingChanged = lastSortingRef.current !== JSON.stringify(sorting);
+        const filtersChanged = lastFiltersRef.current !== JSON.stringify(filters);
+        const searchChanged = lastSearchRef.current !== searchQuery;
 
-        console.log("Sorting changed, fetching data:", sorting);
-        // Fetch data immediately for sorting changes (no debounce)
-        fetchTableData();
-    }, [JSON.stringify(sorting), fetchTableData]);
+        // Update refs to current values
+        lastPaginationRef.current = {
+            pageNumber: pagination.pageNumber,
+            pageSize: pagination.pageSize,
+        };
+        lastSortingRef.current = JSON.stringify(sorting);
+        lastFiltersRef.current = JSON.stringify(filters);
+        lastSearchRef.current = searchQuery;
 
-    // Effect for search and filter changes
-    useEffect(() => {
-        // Don't fetch if both search and filters are empty
+        // Skip empty sorting
         if (
-            searchQuery === "" &&
-            Object.values(filters).every(
-                (value) => (Array.isArray(value) && value.length === 0) || value === ""
-            )
+            sorting.length === 0 &&
+            sortingChanged &&
+            !paginationChanged &&
+            !filtersChanged &&
+            !searchChanged
         ) {
             return;
         }
 
-        console.log("Search/filters changed, fetching data:", { searchQuery, filters });
-        // Use debounced fetch for search and filter changes
-        debouncedFetch();
-    }, [searchQuery, JSON.stringify(filters), debouncedFetch]);
+        // Use debounced fetch for search and filter changes, immediate fetch for pagination and sorting
+        if (searchChanged || filtersChanged) {
+            debouncedFetch();
+        } else {
+            fetchTableData();
+        }
+    }, [
+        pagination.pageNumber,
+        pagination.pageSize,
+        JSON.stringify(sorting),
+        JSON.stringify(filters),
+        searchQuery,
+        fetchTableData,
+        debouncedFetch,
+    ]);
 
     // Handler functions
     const handlePageChange = useCallback((pageIndex: number) => {
@@ -243,7 +263,7 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
         // Only update if the page number actually changed
         setPagination((prev) => {
             if (prev.pageNumber === pageNumber) return prev;
-            console.log(`CommonTable: Changing page from ${prev.pageNumber} to ${pageNumber}`);
+            // console.log(`CommonTable: Changing page from ${prev.pageNumber} to ${pageNumber}`);
             return {
                 ...prev,
                 pageNumber,
@@ -264,55 +284,76 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
     }, []);
 
     const handleSortingChange = useCallback((newSorting: SortingState) => {
-        console.log("Sorting changed:", newSorting);
+        // console.log("Sorting changed:", newSorting);
         setSorting(newSorting);
     }, []);
 
     const handleSearchChange = useCallback((value: string) => {
-        console.log("Search text changed:", value);
+        // console.log("Search text changed:", value);
         setSearchText(value);
     }, []);
 
     const handleSearchSubmit = useCallback(() => {
         console.log("Search submitted:", searchText);
-        setSearchQuery(searchText);
+
+        // Make sure to set searchQuery to an empty string if searchText is empty or just whitespace
+        // Also handle the case where searchText might be undefined
+        const trimmedSearchText = typeof searchText === "string" ? searchText.trim() : "";
+
+        // Update the searchQuery state which is used in API calls
+        // Use a functional update to ensure we're working with the latest state
+        setSearchQuery(() => trimmedSearchText);
+
         // Reset to first page when searching
+        // Use a functional update for pagination as well
         setPagination((prev) => ({
             ...prev,
             pageNumber: 1,
         }));
+
+        // Log the updated search state for debugging
+        console.log("Search query updated to:", trimmedSearchText);
+
+        // Don't trigger any additional effects here
+        // Let the combined effect handle the data fetching
     }, [searchText]);
 
     const handleReload = useCallback(() => {
         console.log("Reloading data...");
+        // Force a data refresh by calling fetchTableData directly
         fetchTableData();
     }, [fetchTableData]);
 
+    // Add a new function specifically for resetting the search query
+    const handleResetSearch = useCallback(() => {
+        console.log("Explicitly resetting search query to empty string");
+        // Update states in a safe order to prevent DOM manipulation issues
+        setSearchText("");
+        // Use a functional update to ensure we're working with the latest state
+        setSearchQuery(() => "");
+        // Use a functional update for pagination as well
+        setPagination((prev) => ({
+            ...prev,
+            pageNumber: 1,
+        }));
+        // Don't trigger any additional effects or reloads here
+        // Let the parent component handle that
+    }, []);
+
     const handleFilterChange = useCallback(
         (filterType: string, value: string | string[]) => {
-            console.log(`Filter ${filterType} changed:`, value);
-            console.log(`Filter value type:`, Array.isArray(value) ? "array" : typeof value);
+            // Check if this is a reset operation (empty value)
+            // const isReset = Array.isArray(value) ? value.length === 0 : value === "";
 
             // Only update if the filter value actually changed
             setFilters((prev) => {
                 if (JSON.stringify(prev[filterType]) === JSON.stringify(value)) return prev;
-
-                // Get the mapped key if available
-                const mappedKey = filterMapping[filterType] || filterType;
-                console.log(`Mapped filter ${filterType} to ${mappedKey}`);
-                console.log(`Previous filter value:`, prev[filterType]);
-                console.log(
-                    `Previous filter value type:`,
-                    Array.isArray(prev[filterType]) ? "array" : typeof prev[filterType]
-                );
 
                 // Force status filter to always be an array
                 const newValue =
                     filterType === "status" && !Array.isArray(value) && value !== ""
                         ? [value]
                         : value;
-
-                console.log(`New filter value after processing:`, newValue);
 
                 return {
                     ...prev,
@@ -325,6 +366,9 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
                 ...prev,
                 pageNumber: 1,
             }));
+
+            // If this is a reset operation from the "Xóa lọc" button, we don't need to do anything else
+            // The combined effect will handle the data fetching
         },
         [filterMapping]
     );
@@ -350,12 +394,12 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
         }
 
         // Log filter configuration for debugging
-        console.log(`Filter ${key}:`, {
-            title,
-            value: filters[key],
-            isArray: Array.isArray(filters[key]),
-            multi: isMultiSelect,
-        });
+        // console.log(`Filter ${key}:`, {
+        //     title,
+        //     value: filters[key],
+        //     isArray: Array.isArray(filters[key]),
+        //     multi: isMultiSelect,
+        // });
 
         acc[key] = {
             options,
@@ -389,6 +433,7 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
                 onSearchChange={handleSearchChange}
                 onSearchSubmit={handleSearchSubmit}
                 onReload={handleReload}
+                onResetSearch={handleResetSearch}
                 filters={tableFilters}
             />
         </Fragment>

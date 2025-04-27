@@ -134,7 +134,7 @@ const BasicDialogContent = React.forwardRef<HTMLDivElement, BasicDialogContentPr
                 {/* Backdrop/Overlay */}
                 <div
                     className={cn(
-                        "fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm",
+                        "fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm basic-dialog-overlay",
                         overlayClass
                     )}
                     onClick={() => setOpen(false)}
@@ -143,7 +143,11 @@ const BasicDialogContent = React.forwardRef<HTMLDivElement, BasicDialogContentPr
                 {/* Dialog Content */}
                 <div
                     ref={ref}
-                    className={cn(dialogVariants({ size }), "dialog-content", className)}
+                    className={cn(
+                        dialogVariants({ size }),
+                        "dialog-content basic-dialog-content",
+                        className
+                    )}
                     {...props}
                 >
                     {children}

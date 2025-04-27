@@ -1,0 +1,34 @@
+/* Z-index fixes for toast notifications and dialogs */
+
+/* Ensure toast notifications appear above dialogs */
+.sonner-toast-container {
+  z-index: 100000 !important; /* Higher than dialog z-index */
+}
+
+/* Fix for react-hot-toast */
+div[id^="react-hot-toast"] {
+  z-index: 100000 !important;
+}
+
+/* Fix for Radix UI Toast */
+[data-radix-toast-viewport] {
+  z-index: 100000 !important;
+}
+
+/* Ensure dialogs have proper z-index */
+.dialog-content {
+  z-index: 9999 !important;
+}
+
+/* Ensure dialog overlays have proper z-index */
+[data-radix-dialog-overlay] {
+  z-index: 9998 !important;
+}
+
+/* Fix for BasicDialog */
+.basic-dialog-overlay {
+  z-index: 9998 !important;
+}
+.basic-dialog-content {
+  z-index: 9999 !important;
+}
