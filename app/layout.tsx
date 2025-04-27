@@ -1,8 +1,8 @@
 import { siteConfig } from "@/config/site";
-import AuthProvider from "@/provider/auth.provider";
 import DirectionProvider from "@/provider/direction.provider";
 import Providers from "@/provider/providers";
 import TanstackProvider from "@/provider/providers.client";
+import { AuthProvider } from "@/context/auth-context";
 import "flatpickr/dist/themes/light.css";
 import { Inter } from "next/font/google";
 import "simplebar-react/dist/simplebar.min.css";

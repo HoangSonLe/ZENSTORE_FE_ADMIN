@@ -1,21 +1,31 @@
 import DashBoardLayoutProvider from "@/provider/dashboard.layout.provider";
-import { authOptions } from "@/lib/auth";
-import { getServerSession, NextAuthOptions } from "next-auth";
 import { redirect } from "next/navigation";
 import { getDictionary } from "@/app/dictionaries";
+import { cookies } from "next/headers";
 
-const layout = async ({ children, params: { lang } }: { children: React.ReactNode; params: { lang: any } }) => {
-  const session = await getServerSession(authOptions as NextAuthOptions);
+const layout = async ({
+    children,
+    params: { lang },
+}: {
+    children: React.ReactNode;
+    params: { lang: any };
+}) => {
+    // Temporarily skip token validation
+    // In a real application, you would check for a valid token here
 
-  if (!session?.user?.email) {
-    redirect("/auth/login");
-  }
+    // Uncomment the following code when you want to enable authentication again
+    /*
+    const cookieStore = cookies();
+    const authToken = cookieStore.get("authToken");
 
-  const trans = await getDictionary(lang);
+    if (!authToken) {
+        redirect("/auth/login");
+    }
+    */
 
-  return (
-    <DashBoardLayoutProvider trans={trans}>{children}</DashBoardLayoutProvider>
-  );
+    const trans = await getDictionary(lang);
+
+    return <DashBoardLayoutProvider trans={trans}>{children}</DashBoardLayoutProvider>;
 };
 
 export default layout;
