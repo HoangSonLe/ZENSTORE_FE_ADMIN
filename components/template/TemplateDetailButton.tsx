@@ -82,30 +82,44 @@ const TemplateDetailButton: React.FC<TemplateDetailButtonProps> = ({
     // Convert flat template list to tree structure
     const convertToTreeData = (templates: ITemplate[]): TreeNodeData[] => {
         // Group templates by code prefix (assuming codes like "GROUP1.SUBGROUP.TEMPLATE")
-        const groups: { [key: string]: TreeNodeData[] } = {};
+        const groups: { [key: string]: { children: TreeNodeData[]; templates: ITemplate[] } } = {};
 
         templates.forEach((template) => {
             const parts = template.templateCode.split(".");
             const groupKey = parts[0];
 
             if (!groups[groupKey]) {
-                groups[groupKey] = [];
+                groups[groupKey] = {
+                    children: [],
+                    templates: [],
+                };
             }
 
-            groups[groupKey].push({
+            groups[groupKey].children.push({
                 id: template.templateId.toString(),
                 label: template.templateName,
                 icon: <FileText className="h-4 w-4" />,
                 templateData: template,
             });
+
+            groups[groupKey].templates.push(template);
         });
 
-        // Convert groups to tree nodes
-        return Object.entries(groups).map(([key, children]) => ({
-            id: key,
-            label: key,
-            children: children,
-        }));
+        // Convert groups to tree nodes using templateName as label
+        return Object.entries(groups).map(([key, group]) => {
+            // Find a representative template for this group to get its name
+            // Sort templates by ID to get a consistent representative
+            const sortedTemplates = [...group.templates].sort(
+                (a, b) => a.templateId - b.templateId
+            );
+            const representativeTemplate = sortedTemplates[0];
+
+            return {
+                id: key,
+                label: representativeTemplate.templateName, // Use templateName as label
+                children: group.children,
+            };
+        });
     };
 
     // Handle template selection

@@ -483,7 +483,6 @@ export default function ProductDetail({
             validateForm();
         }
     }, [formData]);
-
     return (
         <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-190px)]">
             {isLoadingProduct && (
@@ -771,9 +770,24 @@ export default function ProductDetail({
 
                         {/* Short Description - span 2 columns */}
                         <div className="space-y-2 col-span-full">
-                            <Label htmlFor="productShortDetail" className="flex items-center gap-1">
-                                Mô tả <span className="text-destructive">*</span>
-                            </Label>
+                            <div className="flex items-center justify-between mb-1">
+                                <Label
+                                    htmlFor="productShortDetail"
+                                    className="flex items-center gap-1"
+                                >
+                                    Mô tả <span className="text-destructive">*</span>
+                                </Label>
+                                <InsertTemplateButton
+                                    onTemplateSelect={(template) => {
+                                        // Insert the template content into the editor
+                                        handleEditorChange(
+                                            "productShortDetail",
+                                            template.templateDetailContent
+                                        );
+                                    }}
+                                />
+                            </div>
+
                             <div
                                 className={
                                     errors.productShortDetail

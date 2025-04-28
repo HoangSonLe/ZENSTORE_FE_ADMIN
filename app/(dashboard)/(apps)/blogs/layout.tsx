@@ -1,9 +1,9 @@
 export const metadata = {
-  title: "Data Table",
+    title: "Tin tức",
 };
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
+    return <>{children}</>;
 };
 
 export default Layout;

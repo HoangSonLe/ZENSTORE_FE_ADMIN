@@ -86,6 +86,21 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
             }
         }, [initialValue, value]);
 
+        // Update editor content when value prop changes
+        useEffect(() => {
+            // Only update if editor is initialized and value is provided
+            if (isInitializedRef.current && editorRef.current && value !== undefined) {
+                // Get current content from editor
+                const currentContent = editorRef.current.getContent();
+
+                // Only update if the content is different to avoid cursor jumping
+                if (currentContent !== value) {
+                    console.log("Updating editor content from prop:", value);
+                    editorRef.current.setContent(value);
+                }
+            }
+        }, [value]);
+
         const toolbar =
             "accordion accordionremove | blocks fontfamily fontsize | " +
             "bold italic underline strikethrough forecolor backcolor | " +
@@ -151,6 +166,22 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
                     contextmenu: "link image table",
                     importcss_append: true,
                     branding: false,
+                    // Set ui_container to document.body to fix fullscreen mode
+                    ui_container: document.body,
+                    // Ensure the editor is attached to the body for fullscreen
+                    inline: false,
+                    // Ensure dialogs appear above other elements
+                    z_index: 999999,
+                    // Setup function to handle fullscreen mode
+                    setup: (editor) => {
+                        editor.on("FullscreenStateChanged", (e) => {
+                            // When entering fullscreen mode
+                            if (editor.plugins.fullscreen.isFullscreen()) {
+                                // Move the editor to the body element
+                                document.body.appendChild(editor.getContainer());
+                            }
+                        });
+                    },
                     file_picker_types: "file image media",
                     file_picker_callback: (cb, value, meta) => {
                         const input = document.createElement("input");
