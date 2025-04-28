@@ -156,7 +156,6 @@ export default function BlogTable() {
                             onSuccess={() => setRefreshTrigger((prev) => prev + 1)}
                         />
                     )}
-                    onDelete={handleDeleteBlog}
                 />
             ),
             size: 100,

@@ -1104,7 +1104,7 @@ export const menusConfig = {
             {
                 title: "Banner",
                 icon: DashBoard,
-                href: "/dashboard",
+                href: "/banners",
             },
         ],
     },

@@ -21,7 +21,7 @@ export interface IProduct {
     createdAt?: Date;
     updatedAt?: Date;
 }
-export interface IProductCreateOrUpdate extends IProduct {
+export interface IProductCreateOrUpdate extends Omit<IProduct, "createdAt" | "updatedAt"> {
     uploadFiles: string[];
 }
 export interface IProductQuery extends IPagingQuery {

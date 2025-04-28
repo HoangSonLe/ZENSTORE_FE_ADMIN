@@ -1,4 +1,5 @@
 import { EBannerOrder } from "../../constants/enum";
+import { IPagingQuery } from "../interface";
 
 export interface IBanner {
     bannerId: number;
@@ -11,4 +12,14 @@ export interface IBanner {
     bannerImage: string;
     createdAt: string; // or Date if you parse it
     updatedAt: string; // or Date if you parse it
+}
+
+export interface IBannerCreateOrUpdate extends Omit<IBanner, "createdAt" | "updatedAt"> {
+    uploadFile?: string;
+}
+
+export interface IBannerQuery extends IPagingQuery {
+    keyword?: string;
+    state?: boolean;
+    bannerTypeCode?: EBannerOrder;
 }
