@@ -151,6 +151,10 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
                     contextmenu: "link image table",
                     importcss_append: true,
                     branding: false,
+                    // Ensure dialogs appear above other elements
+                    z_index: 99999,
+                    skin_url: "/tinymce/skins/ui/oxide",
+                    content_css: "/tinymce/skins/content/default/content.css",
                     file_picker_types: "file image media",
                     file_picker_callback: (cb, value, meta) => {
                         const input = document.createElement("input");
@@ -165,12 +169,10 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
                         input.onchange = function (e: any) {
                             const file = e.target.files[0];
                             const reader = new FileReader();
-
                             reader.onload = function (e) {
                                 const result = e.target?.result as string;
                                 cb(result, { title: file.name });
                             };
-
                             reader.readAsDataURL(file);
                         };
 

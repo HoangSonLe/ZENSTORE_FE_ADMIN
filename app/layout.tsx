@@ -9,6 +9,7 @@ import "simplebar-react/dist/simplebar.min.css";
 import "./assets/scss/globals.scss";
 import "./assets/scss/theme.scss";
 import "./styles/z-index-fixes.css";
+import "./styles/ckeditor-fixes.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
