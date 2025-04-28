@@ -2,13 +2,13 @@
 
 /* Ensure TinyMCE editor container has proper stacking context */
 .tox-tinymce {
-  position: relative;
-  z-index: 1;
+    position: relative;
+    z-index: 1;
 }
 
 /* When TinyMCE is focused, increase its z-index to ensure dialogs appear properly */
 .tox-tinymce:focus-within {
-  z-index: 10;
+    z-index: 10;
 }
 
 /* Fix for TinyMCE dialogs and popups to ensure they appear above other elements */
@@ -27,63 +27,85 @@
 .tox-collection--grid,
 .tox-collection--list,
 .tox-notifications-container {
-  z-index: 99999 !important;
+    z-index: 99999 !important;
 }
 
 /* Ensure TinyMCE dialogs appear above other elements */
 .tox-dialog {
-  z-index: 100000 !important;
+    z-index: 100000 !important;
 }
 
 /* Fix for TinyMCE fullscreen mode */
 .tox-fullscreen {
-  z-index: 99990 !important;
+    z-index: 99990 !important;
+}
+
+/* Ensure editor is visible when exiting fullscreen mode */
+.tox-tinymce.tox-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 99990 !important;
+}
+
+/* Ensure editor container is properly displayed after exiting fullscreen */
+/* .tox-tinymce:not(.tox-fullscreen) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+} */
+
+/* Fix for editor content in fullscreen mode */
+.tox-fullscreen .tox-edit-area__iframe {
+    background-color: white !important;
 }
 
 /* Fix for TinyMCE image dialog */
 .tox-image-tools {
-  z-index: 100001 !important;
+    z-index: 100001 !important;
 }
 
 /* Fix for TinyMCE image dialog toolbar */
 .tox-image-tools__toolbar {
-  z-index: 100002 !important;
+    z-index: 100002 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
 .tox-image-tools__image-wrapper .tox-image-tools__image {
-  z-index: 1 !important;
+    z-index: 1 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
 .tox-image-tools__image-wrapper .tox-image-tools__image-bg {
-  z-index: 0 !important;
+    z-index: 0 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
 .tox-image-tools__image-wrapper .tox-image-tools__image-mask {
-  z-index: 2 !important;
+    z-index: 2 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
 .tox-image-tools__image-wrapper .tox-image-tools__image-h-flip,
 .tox-image-tools__image-wrapper .tox-image-tools__image-v-flip {
-  z-index: 3 !important;
+    z-index: 3 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop {
-  z-index: 4 !important;
+    z-index: 4 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
 .tox-image-tools__image-wrapper .tox-image-tools__image-mask-handle {
-  z-index: 5 !important;
+    z-index: 5 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle {
-  z-index: 6 !important;
+    z-index: 6 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -91,7 +113,7 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-nw,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-se,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-sw {
-  z-index: 7 !important;
+    z-index: 7 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -99,7 +121,7 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-e,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-s,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-w {
-  z-index: 8 !important;
+    z-index: 8 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -107,7 +129,7 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-nw,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-se,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-sw {
-  z-index: 9 !important;
+    z-index: 9 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -115,7 +137,7 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-e,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-s,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-w {
-  z-index: 10 !important;
+    z-index: 10 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -123,7 +145,7 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-nw,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-se,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-sw {
-  z-index: 11 !important;
+    z-index: 11 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -131,7 +153,7 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-e,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-s,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-w {
-  z-index: 12 !important;
+    z-index: 12 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -139,7 +161,7 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-nw,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-se,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-sw {
-  z-index: 13 !important;
+    z-index: 13 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -147,7 +169,7 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-e,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-s,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-w {
-  z-index: 14 !important;
+    z-index: 14 !important;
 }
 
 /* Fix for TinyMCE image dialog resize handles */
@@ -155,5 +177,5 @@
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-nw,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-se,
 .tox-image-tools__image-wrapper .tox-image-tools__image-crop-handle-sw {
-  z-index: 15 !important;
+    z-index: 15 !important;
 }

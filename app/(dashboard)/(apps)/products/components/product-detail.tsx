@@ -380,14 +380,14 @@ export default function ProductDetail({
                                         const base64String = reader.result as string;
 
                                         // Extract just the base64 part without the data:image/jpeg;base64, prefix
-                                        const base64Data = base64String.split(",")[1];
+                                        // const base64Data = base64String.split(",")[1];
 
-                                        console.log(
-                                            `Converted file ${file.name} to base64 (${base64Data.length} chars)`
-                                        );
+                                        // console.log(
+                                        //     `Converted file ${file.name} to base64 (${base64Data.length} chars)`
+                                        // );
 
                                         // Resolve the promise with the base64 data
-                                        resolve(base64Data);
+                                        resolve(base64String);
                                     } catch (error) {
                                         console.error("Error processing base64 result:", error);
                                         reject(error);

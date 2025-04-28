@@ -64,14 +64,11 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
         const editorRef = useRef<any>(null);
         const initialContentRef = useRef(initialValue || value || "");
         const isInitializedRef = useRef(false);
+        let debounceTimeout: any = null;
 
-        // Expose methods to parent using useImperativeHandle
         useImperativeHandle(ref, () => ({
-            getContent: () => {
-                return editorRef.current
-                    ? editorRef.current.getContent()
-                    : initialContentRef.current;
-            },
+            getContent: () =>
+                editorRef.current ? editorRef.current.getContent() : initialContentRef.current,
             setContent: (content: string) => {
                 if (editorRef.current) {
                     editorRef.current.setContent(content);
@@ -79,23 +76,16 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
             },
         }));
 
-        // Use initialValue or value, with initialValue taking precedence
         useEffect(() => {
             if (!isInitializedRef.current) {
                 initialContentRef.current = initialValue || value || "";
             }
         }, [initialValue, value]);
 
-        // Update editor content when value prop changes
         useEffect(() => {
-            // Only update if editor is initialized and value is provided
             if (isInitializedRef.current && editorRef.current && value !== undefined) {
-                // Get current content from editor
                 const currentContent = editorRef.current.getContent();
-
-                // Only update if the content is different to avoid cursor jumping
                 if (currentContent !== value) {
-                    console.log("Updating editor content from prop:", value);
                     editorRef.current.setContent(value);
                 }
             }
@@ -128,7 +118,6 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
             "visualchars",
             "fullscreen",
             "media",
-            // "codesample",
             "charmap",
             "pagebreak",
             "nonbreaking",
@@ -137,12 +126,10 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
             ...(morePlugins ?? []),
         ];
 
-        // Mark as initialized after first render
         useEffect(() => {
             isInitializedRef.current = true;
         }, []);
 
-        // Custom onChange handler to prevent cursor jumping
         const handleEditorChange = (content: string) => {
             onChange(content);
         };
@@ -166,24 +153,50 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
                     contextmenu: "link image table",
                     importcss_append: true,
                     branding: false,
-                    // Set ui_container to document.body to fix fullscreen mode
-                    ui_container: document.body,
-                    // Ensure the editor is attached to the body for fullscreen
+                    ui_container: document.body, // Ensure editor is properly moved to body
                     inline: false,
-                    // Ensure dialogs appear above other elements
                     z_index: 999999,
-                    // Setup function to handle fullscreen mode
                     setup: (editor) => {
-                        editor.on("FullscreenStateChanged", (e) => {
-                            // When entering fullscreen mode
-                            if (editor.plugins.fullscreen.isFullscreen()) {
-                                // Move the editor to the body element
-                                document.body.appendChild(editor.getContainer());
+                        let originalParent: HTMLElement | null = null;
+                        let contentBeforeFullscreen: string = "";
+
+                        editor.on("FullscreenStateChanged", () => {
+                            if (debounceTimeout) clearTimeout(debounceTimeout);
+
+                            const isFullscreen = editor.plugins.fullscreen.isFullscreen();
+
+                            if (isFullscreen) {
+                                contentBeforeFullscreen = editor.getContent();
                             }
+
+                            // debounceTimeout = setTimeout(() => {
+                            //     debugger;
+                            //     const editorContainer = editor.getContainer();
+
+                            //     if (editorContainer) {
+                            //         if (isFullscreen) {
+                            //             originalParent = editorContainer.parentElement;
+                            //             document.body.appendChild(editorContainer);
+
+                            //             setTimeout(() => {
+                            //                 editor.setContent(contentBeforeFullscreen);
+                            //             }, 50); // Small delay to ensure content is restored
+                            //         } else {
+                            //             const currentContent = editor.getContent();
+
+                            //             if (originalParent) {
+                            //                 originalParent.appendChild(editorContainer);
+                            //                 setTimeout(() => {
+                            //                     editor.setContent(currentContent);
+                            //                 }, 50); // Small delay to ensure content is restored
+                            //             }
+                            //         }
+                            //     }
+                            // }, 100);
                         });
                     },
                     file_picker_types: "file image media",
-                    file_picker_callback: (cb, value, meta) => {
+                    file_picker_callback: (cb, _value, meta) => {
                         const input = document.createElement("input");
                         input.setAttribute("type", "file");
 
