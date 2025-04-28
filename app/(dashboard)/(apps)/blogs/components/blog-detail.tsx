@@ -68,7 +68,19 @@ export default function BlogDetail({
                     ...response.data,
                     // If uploadFiles doesn't exist, use existing image URLs
                     uploadFiles: response.data.uploadFiles || [],
+                    // Ensure newsThumbnail is a valid URL or empty string
+                    newsThumbnail: response.data.newsThumbnail || "",
                 } as IBlogCreateOrUpdate;
+
+                // Validate newsThumbnail URL
+                if (blogData.newsThumbnail) {
+                    try {
+                        new URL(blogData.newsThumbnail);
+                    } catch (error) {
+                        console.warn("Invalid newsThumbnail URL:", blogData.newsThumbnail);
+                        blogData.newsThumbnail = ""; // Reset to empty string if invalid
+                    }
+                }
 
                 setFormData(blogData);
             }
@@ -121,15 +133,15 @@ export default function BlogDetail({
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
 
-        if (!formData.newsTitle.trim()) {
+        if (!formData.newsTitle || !formData.newsTitle.trim()) {
             newErrors.newsTitle = "Tiêu đề không được để trống";
         }
 
-        if (!formData.newsShortContent.trim()) {
+        if (!formData.newsShortContent || !formData.newsShortContent.trim()) {
             newErrors.newsShortContent = "Mô tả ngắn không được để trống";
         }
 
-        if (!formData.newsDetailContent.trim()) {
+        if (!formData.newsDetailContent || !formData.newsDetailContent.trim()) {
             newErrors.newsDetailContent = "Nội dung chi tiết không được để trống";
         }
 
@@ -203,11 +215,16 @@ export default function BlogDetail({
         <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-190px)]">
             {/* Validation Alert */}
             {showValidationError && Object.keys(errors).length > 0 && (
-                <Alert variant="destructive" className="mb-4">
+                <Alert className="mb-4 bg-destructive/15 text-destructive">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>Vui lòng điền đầy đủ thông tin bắt buộc.</AlertDescription>
+                    <AlertDescription>Vui lòng điền đủ dữ liệu trước khi lưu.</AlertDescription>
                 </Alert>
             )}
+
+            {/* Required Fields Note */}
+            <div className="mb-4 text-sm text-gray-500">
+                <span className="text-red-500">*</span> Trường bắt buộc
+            </div>
 
             {/* Scrollable Content Area */}
             <ScrollArea className="flex-1 pr-4">
@@ -215,7 +232,7 @@ export default function BlogDetail({
                     {/* Blog Title */}
                     <div className="grid gap-2">
                         <Label htmlFor="newsTitle" className="required">
-                            Tiêu đề
+                            Tiêu đề <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             id="newsTitle"
@@ -232,7 +249,7 @@ export default function BlogDetail({
                     {/* Blog Short Content */}
                     <div className="grid gap-2">
                         <Label htmlFor="newsShortContent" className="required">
-                            Mô tả ngắn
+                            Mô tả ngắn <span className="text-red-500">*</span>
                         </Label>
                         <div
                             className={
@@ -253,7 +270,11 @@ export default function BlogDetail({
                     {/* Blog Images */}
                     <div className="grid gap-2">
                         <BlogFileUploader
-                            initialImages={formData.newsThumbnail ? [formData.newsThumbnail] : []}
+                            initialImages={
+                                formData.newsThumbnail && formData.newsThumbnail.trim() !== ""
+                                    ? [formData.newsThumbnail]
+                                    : []
+                            }
                             onImagesChange={handleImagesChange}
                             maxFiles={1}
                             label="Ảnh đại diện"
@@ -273,7 +294,7 @@ export default function BlogDetail({
                     {/* Blog Detail Content */}
                     <div className="grid gap-2">
                         <Label htmlFor="newsDetailContent" className="required">
-                            Nội dung chi tiết
+                            Nội dung chi tiết <span className="text-red-500">*</span>
                         </Label>
                         <div
                             className={

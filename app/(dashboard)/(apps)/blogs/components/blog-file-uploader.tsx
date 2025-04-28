@@ -27,7 +27,18 @@ export default function BlogFileUploader({
 
     // Initialize with existing images
     useEffect(() => {
-        setExistingImages(initialImages || []);
+        // Filter out any invalid URLs
+        const validImages = (initialImages || []).filter((url) => {
+            try {
+                // Check if URL is valid by attempting to construct a URL object
+                new URL(url);
+                return true;
+            } catch (error) {
+                console.warn("Invalid image URL filtered out:", url);
+                return false;
+            }
+        });
+        setExistingImages(validImages);
     }, [initialImages]);
 
     // Handle file selection
@@ -75,10 +86,10 @@ export default function BlogFileUploader({
             // Revoke the object URL to avoid memory leaks
             URL.revokeObjectURL(updatedImages[index].preview);
             updatedImages.splice(index, 1);
-            
+
             // Call the callback with the updated files
             onImagesChange(updatedImages);
-            
+
             return updatedImages;
         });
     };
@@ -110,20 +121,36 @@ export default function BlogFileUploader({
                             key={`existing-${index}`}
                             className="relative h-24 w-24 rounded-md overflow-hidden border"
                         >
-                            <Image
-                                src={imageUrl}
-                                alt={`Existing image ${index + 1}`}
-                                fill
-                                className="object-cover"
-                            />
+                            {(() => {
+                                try {
+                                    // Validate URL before rendering Image component
+                                    new URL(imageUrl);
+                                    return (
+                                        <Image
+                                            src={imageUrl}
+                                            alt={`Existing image ${index + 1}`}
+                                            fill
+                                            className="object-cover"
+                                            unoptimized
+                                        />
+                                    );
+                                } catch (error) {
+                                    // Fallback for invalid URLs
+                                    return (
+                                        <div className="flex items-center justify-center h-full bg-gray-100 text-gray-400">
+                                            <span>Invalid Image</span>
+                                        </div>
+                                    );
+                                }
+                            })()}
                             <Button
                                 type="button"
-                                variant="destructive"
+                                variant="outline"
                                 size="icon"
-                                className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                                className="absolute top-1 right-1 h-6 w-6 rounded-full bg-red-500 hover:bg-red-600"
                                 onClick={() => removeExistingImage(index)}
                             >
-                                <X className="h-4 w-4" />
+                                <X className="h-4 w-4 text-white" />
                             </Button>
                         </div>
                     ))}
@@ -134,20 +161,36 @@ export default function BlogFileUploader({
                             key={`new-${index}`}
                             className="relative h-24 w-24 rounded-md overflow-hidden border"
                         >
-                            <Image
-                                src={image.preview}
-                                alt={`New image ${index + 1}`}
-                                fill
-                                className="object-cover"
-                            />
+                            {(() => {
+                                try {
+                                    // Validate URL before rendering Image component
+                                    new URL(image.preview);
+                                    return (
+                                        <Image
+                                            src={image.preview}
+                                            alt={`New image ${index + 1}`}
+                                            fill
+                                            className="object-cover"
+                                            unoptimized
+                                        />
+                                    );
+                                } catch (error) {
+                                    // Fallback for invalid URLs
+                                    return (
+                                        <div className="flex items-center justify-center h-full bg-gray-100 text-gray-400">
+                                            <span>Invalid Image</span>
+                                        </div>
+                                    );
+                                }
+                            })()}
                             <Button
                                 type="button"
-                                variant="destructive"
+                                variant="outline"
                                 size="icon"
-                                className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                                className="absolute top-1 right-1 h-6 w-6 rounded-full bg-red-500 hover:bg-red-600"
                                 onClick={() => removeFile(index)}
                             >
-                                <X className="h-4 w-4" />
+                                <X className="h-4 w-4 text-white" />
                             </Button>
                         </div>
                     ))}

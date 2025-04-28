@@ -17,7 +17,7 @@ export default {
     createOrUpdateBlogDetail(
         params: IApiRequestParams<null, null, IBlog>
     ): Promise<IApiResponse<IBlog>> {
-        return apiService({ method: "POST", url: "/New/CreateOrUpdate", ...params });
+        return apiService({ method: "POST", url: "/New/Update", ...params });
     },
     deleteBlog(
         params: IApiRequestParams<null, { newId: number }, null>
