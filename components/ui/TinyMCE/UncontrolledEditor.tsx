@@ -16,7 +16,7 @@ import "tinymce/plugins/code";
 import "tinymce/plugins/codesample";
 import "tinymce/plugins/directionality";
 import "tinymce/plugins/emoticons";
-import "tinymce/plugins/fullscreen";
+// Removed fullscreen plugin as we'll implement our own
 import "tinymce/plugins/help";
 import "tinymce/plugins/help/js/i18n/keynav/en";
 import "tinymce/plugins/image";
@@ -107,7 +107,7 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
             "alignleft aligncenter alignright alignjustify align | " +
             "bullist numlist outdent indent lineheight | " +
             "link image table media | " +
-            "charmap emoticons code fullscreen preview | " +
+            "charmap emoticons code custom_fullscreen preview | " + // Changed fullscreen to custom_fullscreen
             "pagebreak | ltr rtl | removeformat";
 
         const plugins = [
@@ -126,7 +126,7 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
             "code",
             "visualblocks",
             "visualchars",
-            "fullscreen",
+            // Removed fullscreen plugin
             "media",
             // "codesample",
             "charmap",
@@ -174,16 +174,166 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
                     z_index: 999999,
                     // Setup function to handle fullscreen mode
                     setup: (editor) => {
-                        editor.on("FullscreenStateChanged", (e) => {
-                            // When entering fullscreen mode
-                            if (editor.plugins.fullscreen.isFullscreen()) {
-                                // Move the editor to the body element
-                                document.body.appendChild(editor.getContainer());
+                        // Track fullscreen state
+                        let isFullscreen = false;
+                        let originalHeight = height ?? 500;
+                        let originalStyles: Record<string, string> = {};
+
+                        // Register custom fullscreen button
+                        editor.ui.registry.addButton("custom_fullscreen", {
+                            icon: "fullscreen",
+                            tooltip: "Fullscreen",
+                            onAction: function () {
+                                try {
+                                    const editorContainer = editor.getContainer();
+                                    const editorIframe = editor
+                                        .getContentAreaContainer()
+                                        .querySelector("iframe");
+                                    const editorToolbar =
+                                        editorContainer.querySelector(".tox-editor-header");
+
+                                    if (!isFullscreen) {
+                                        // Enter fullscreen mode
+                                        console.log("Entering custom fullscreen mode");
+
+                                        // Save original styles
+                                        originalStyles = {
+                                            position: editorContainer.style.position,
+                                            top: editorContainer.style.top,
+                                            left: editorContainer.style.left,
+                                            width: editorContainer.style.width,
+                                            height: editorContainer.style.height,
+                                            zIndex: editorContainer.style.zIndex,
+                                        };
+
+                                        // Apply fullscreen styles
+                                        document.body.classList.add("tox-fullscreen");
+                                        editorContainer.classList.add("tox-fullscreen");
+
+                                        // Set container styles
+                                        editorContainer.style.position = "fixed";
+                                        editorContainer.style.top = "0";
+                                        editorContainer.style.left = "0";
+                                        editorContainer.style.width = "100vw";
+                                        editorContainer.style.height = "100vh";
+                                        editorContainer.style.zIndex = "9999";
+
+                                        // Adjust iframe height to fill available space
+                                        if (editorIframe) {
+                                            const toolbarHeight = editorToolbar
+                                                ? (editorToolbar as HTMLElement).offsetHeight
+                                                : 0;
+                                            const statusbarHeight = editorContainer.querySelector(
+                                                ".tox-statusbar"
+                                            )
+                                                ? (
+                                                      editorContainer.querySelector(
+                                                          ".tox-statusbar"
+                                                      ) as HTMLElement
+                                                  ).offsetHeight
+                                                : 0;
+
+                                            // Calculate available height
+                                            const availableHeight =
+                                                window.innerHeight -
+                                                toolbarHeight -
+                                                statusbarHeight;
+                                            editorIframe.style.height = `${availableHeight}px`;
+                                        }
+
+                                        // Set fullscreen state
+                                        isFullscreen = true;
+                                    } else {
+                                        // Exit fullscreen mode
+                                        console.log("Exiting custom fullscreen mode");
+
+                                        // Remove fullscreen classes
+                                        document.body.classList.remove("tox-fullscreen");
+                                        editorContainer.classList.remove("tox-fullscreen");
+
+                                        // Restore original styles
+                                        editorContainer.style.position =
+                                            originalStyles.position || "";
+                                        editorContainer.style.top = originalStyles.top || "";
+                                        editorContainer.style.left = originalStyles.left || "";
+                                        editorContainer.style.width = originalStyles.width || "";
+                                        editorContainer.style.height = originalStyles.height || "";
+                                        editorContainer.style.zIndex = originalStyles.zIndex || "";
+
+                                        // Restore iframe height
+                                        if (editorIframe) {
+                                            editorIframe.style.height = "";
+                                        }
+
+                                        // Reset editor height
+                                        // Use editor.dom to set height instead of settings
+                                        editor.dom.setStyle(
+                                            editor.getContainer(),
+                                            "height",
+                                            `${originalHeight}px`
+                                        );
+
+                                        // Set fullscreen state
+                                        isFullscreen = false;
+                                    }
+
+                                    // Trigger resize to ensure editor layout updates
+                                    editor.fire("ResizeEditor");
+                                } catch (error) {
+                                    console.error("Error handling custom fullscreen:", error);
+                                }
+                            },
+                        });
+
+                        // Handle window resize in fullscreen mode
+                        const handleWindowResize = () => {
+                            if (isFullscreen) {
+                                try {
+                                    const editorContainer = editor.getContainer();
+                                    const editorIframe = editor
+                                        .getContentAreaContainer()
+                                        .querySelector("iframe");
+                                    const editorToolbar =
+                                        editorContainer.querySelector(".tox-editor-header");
+
+                                    if (editorIframe) {
+                                        const toolbarHeight = editorToolbar
+                                            ? (editorToolbar as HTMLElement).offsetHeight
+                                            : 0;
+                                        const statusbarHeight = editorContainer.querySelector(
+                                            ".tox-statusbar"
+                                        )
+                                            ? (
+                                                  editorContainer.querySelector(
+                                                      ".tox-statusbar"
+                                                  ) as HTMLElement
+                                              ).offsetHeight
+                                            : 0;
+
+                                        // Calculate available height
+                                        const availableHeight =
+                                            window.innerHeight - toolbarHeight - statusbarHeight;
+                                        editorIframe.style.height = `${availableHeight}px`;
+                                    }
+                                } catch (error) {
+                                    console.error(
+                                        "Error handling window resize in fullscreen:",
+                                        error
+                                    );
+                                }
                             }
+                        };
+
+                        // Add window resize listener
+                        window.addEventListener("resize", handleWindowResize);
+
+                        // Clean up event listener when editor is removed
+                        editor.on("remove", () => {
+                            window.removeEventListener("resize", handleWindowResize);
                         });
                     },
                     file_picker_types: "file image media",
-                    file_picker_callback: (cb, value, meta) => {
+                    file_picker_callback: (cb, _value, meta) => {
                         const input = document.createElement("input");
                         input.setAttribute("type", "file");
 
