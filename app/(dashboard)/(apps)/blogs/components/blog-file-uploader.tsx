@@ -101,6 +101,10 @@ export default function BlogFileUploader({
             updatedImages.splice(index, 1);
             return updatedImages;
         });
+
+        // Notify parent component that existing image has been removed
+        // Pass an empty array to indicate removal of existing image
+        onImagesChange([]);
     };
 
     // Clean up object URLs when component unmounts

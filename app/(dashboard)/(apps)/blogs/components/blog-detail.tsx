@@ -39,7 +39,7 @@ export default function BlogDetail({
         newsDetailContent: "",
         newsShortContent: "",
         state: true,
-        uploadFiles: [],
+        uploadFile: "",
     },
     onClose,
     onSubmit,
@@ -63,11 +63,11 @@ export default function BlogDetail({
             });
 
             if (response.isSuccess && response.data) {
-                // Prepare data with both existing images
+                // Prepare data with existing image
                 const blogData = {
                     ...response.data,
-                    // If uploadFiles doesn't exist, use existing image URLs
-                    uploadFiles: response.data.uploadFiles || [],
+                    // If uploadFile doesn't exist, use empty string
+                    uploadFile: response.data.uploadFile || "",
                     // Ensure newsThumbnail is a valid URL or empty string
                     newsThumbnail: response.data.newsThumbnail || "",
                 } as IBlogCreateOrUpdate;
@@ -127,6 +127,15 @@ export default function BlogDetail({
     // Handle image changes
     const handleImagesChange = (files: File[]) => {
         setActualFileObjects(files);
+
+        // If files array is empty, it means the existing image was removed
+        if (files.length === 0) {
+            setFormData((prev) => ({
+                ...prev,
+                newsThumbnail: "", // Clear the existing image
+                uploadFile: "", // Clear any upload in progress
+            }));
+        }
     };
 
     // Validate form data
@@ -165,38 +174,33 @@ export default function BlogDetail({
             let updatedBlogData: IBlogCreateOrUpdate;
 
             if (actualFileObjects.length > 0) {
-                // Convert files to base64
-                const fileConversionPromises = actualFileObjects.map(
-                    (file) =>
-                        new Promise<string>((resolve, reject) => {
-                            try {
-                                const reader = new FileReader();
-                                reader.onload = () => {
-                                    const base64String = reader.result as string;
-                                    resolve(base64String);
-                                };
-                                reader.onerror = reject;
-                                reader.readAsDataURL(file);
-                            } catch (error) {
-                                console.error("Error setting up file reader:", error);
-                                reject(error);
-                            }
-                        })
-                );
+                // Convert file to base64
+                const file = actualFileObjects[0]; // Only use the first file
 
-                // Wait for all files to be converted to base64
-                const base64Files = await Promise.all(fileConversionPromises);
+                try {
+                    const base64String = await new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            resolve(reader.result as string);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
 
-                // Create a blog object with the base64 encoded files
-                updatedBlogData = {
-                    ...formData,
-                    uploadFiles: base64Files,
-                };
+                    // Create a blog object with the base64 encoded file
+                    updatedBlogData = {
+                        ...formData,
+                        uploadFile: base64String,
+                    };
+                } catch (error) {
+                    console.error("Error converting file to base64:", error);
+                    throw error;
+                }
             } else {
-                // No new files, keep existing data
+                // No new file, keep existing data
                 updatedBlogData = {
                     ...formData,
-                    uploadFiles: [],
+                    uploadFile: "",
                 };
             }
 

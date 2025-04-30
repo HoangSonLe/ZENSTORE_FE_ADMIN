@@ -185,7 +185,7 @@ export default function BlogTable() {
     return (
         <Fragment>
             {/* Create Blog Button */}
-            <div className="flex justify-end mb-4">
+            {/* <div className="flex justify-end mb-4">
                 <Button
                     onClick={() => setIsCreateDialogOpen(true)}
                     className="flex items-center gap-2"
@@ -193,7 +193,7 @@ export default function BlogTable() {
                     <PlusCircle className="h-4 w-4" />
                     Tạo mới
                 </Button>
-            </div>
+            </div> */}
 
             {/* Create Blog Dialog */}
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>

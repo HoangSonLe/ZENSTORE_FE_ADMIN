@@ -1,6 +1,6 @@
 import { apiService } from "../axios";
 import { IApiRequestParams, IApiResponse, IApiResponseTable } from "../interface";
-import { IBlog, IBlogQuery } from "./blog.interface";
+import { IBlog, IBlogCreateOrUpdate, IBlogQuery } from "./blog.interface";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
@@ -15,7 +15,7 @@ export default {
         return apiService({ url: "/New/FindById", ...params });
     },
     createOrUpdateBlogDetail(
-        params: IApiRequestParams<null, null, IBlog>
+        params: IApiRequestParams<null, null, IBlogCreateOrUpdate>
     ): Promise<IApiResponse<IBlog>> {
         return apiService({ method: "POST", url: "/New/Update", ...params });
     },

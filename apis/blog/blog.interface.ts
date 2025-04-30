@@ -9,11 +9,11 @@ export interface IBlog {
     newsShortContent: string;
     state: boolean;
     createdAt: string;
-    uploadFiles?: string[]; // For handling image uploads
+    uploadFile?: string; // For handling image upload
 }
 
 export interface IBlogCreateOrUpdate extends Omit<IBlog, "createdAt"> {
-    uploadFiles?: string[];
+    uploadFile?: string;
 }
 
 export interface IBlogQuery extends IPagingQuery {
