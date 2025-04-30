@@ -4,6 +4,7 @@ import { Row } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import dayjs from "dayjs";
 import { formatVND } from "@/lib/utils";
+import { HtmlContentRenderer } from "@/components/ui/html-content-renderer";
 
 // Type for badge colors
 export type BadgeColor = "default" | "success" | "warning" | "destructive" | "info" | "secondary";
@@ -309,5 +310,24 @@ export function renderBoolean<T>(
     } catch (error) {
         console.error("Error rendering boolean:", error);
         return <div className={`text-${alignment}`}>{falseText}</div>;
+    }
+}
+
+// HTML content renderer with expand/collapse functionality
+export function renderHtmlContent<T>(row: Row<T>, accessorKey: string, maxHeight: number = 100) {
+    try {
+        const content = row.getValue(accessorKey);
+        // If content is null or undefined, return N/A
+        if (content === null || content === undefined) {
+            return <div>N/A</div>;
+        }
+
+        // Convert to string if it's not already a string
+        const htmlContent = typeof content === "string" ? content : String(content);
+
+        return <HtmlContentRenderer content={htmlContent} maxHeight={maxHeight} />;
+    } catch (error) {
+        console.error("Error rendering HTML content:", error);
+        return <div>N/A</div>;
     }
 }

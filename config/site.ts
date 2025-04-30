@@ -1,5 +1,5 @@
 export const siteConfig = {
-    name: "DashTail Next js Admin Template",
+    name: "Zen Store",
     description: null,
     theme: "violet",
     layout: "vertical",

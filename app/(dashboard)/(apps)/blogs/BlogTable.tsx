@@ -5,7 +5,12 @@ import { IBlog, IBlogQuery } from "@/apis/blog/blog.interface";
 import { CommonTable } from "@/components/table/CommonTable";
 import { ActionButtons } from "@/components/table/action-buttons";
 import { DataTableColumnHeader } from "@/components/table/advanced/components/data-table-column-header";
-import { renderDate, renderImage, renderText } from "@/components/table/cell-renderers";
+import {
+    renderDate,
+    renderImage,
+    renderText,
+    renderHtmlContent,
+} from "@/components/table/cell-renderers";
 import { ColumnDef } from "@tanstack/react-table";
 import { Fragment, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
@@ -116,7 +121,7 @@ export default function BlogTable() {
         {
             accessorKey: "newsShortContent",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Mô tả ngắn" />,
-            cell: ({ row }) => renderText(row, "newsShortContent"),
+            cell: ({ row }) => renderHtmlContent(row, "newsShortContent", 80),
             size: 300,
             enableSorting: false,
         },
