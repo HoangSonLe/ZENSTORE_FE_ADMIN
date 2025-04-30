@@ -53,22 +53,22 @@ export function renderImage<T>(
                         src={imageUrl}
                         alt={alt}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                            // Replace the img element with a div containing "N/A"
-                            const imgElement = e.currentTarget;
-                            const parentElement = imgElement.parentElement;
+                        // onError={(e) => {
+                        //     // Replace the img element with a div containing "N/A"
+                        //     const imgElement = e.currentTarget;
+                        //     const parentElement = imgElement.parentElement;
 
-                            if (parentElement) {
-                                // Create a div with "N/A" text
-                                const fallbackDiv = document.createElement("div");
-                                fallbackDiv.className =
-                                    "flex items-center justify-center h-full text-gray-400";
-                                fallbackDiv.textContent = "N/A";
+                        //     if (parentElement) {
+                        //         // Create a div with "N/A" text
+                        //         const fallbackDiv = document.createElement("div");
+                        //         fallbackDiv.className =
+                        //             "flex items-center justify-center h-full text-gray-400";
+                        //         fallbackDiv.textContent = "N/A";
 
-                                // Replace the img with the div
-                                parentElement.replaceChild(fallbackDiv, imgElement);
-                            }
-                        }}
+                        //         // Replace the img with the div
+                        //         parentElement.replaceChild(fallbackDiv, imgElement);
+                        //     }
+                        // }}
                     />
                 </div>
             </div>
