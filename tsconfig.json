@@ -43,10 +43,10 @@
     "components/ui/tabs.jsx",
     "components/ui/slider.jsx",
     "app/not-found.js",
-    "app/(dashboard)/(chart)/(re-chart)/charts-rechart-pie/twolevel-pie.jsx",
-    "app/(dashboard)/(chart)/(re-chart)/charts-rechart-pie/two-simple-pie.jsx",
-    "app/(dashboard)/(chart)/(re-chart)/charts-rechart-radialbar/basic-radial-bar.jsx",
-    "app/(dashboard)/(chart)/(re-chart)/charts-rechart-bar/barchart-with-multixaxis.tsx"
+    "app/pages/(chart)/(re-chart)/charts-rechart-pie/twolevel-pie.jsx",
+    "app/pages/(chart)/(re-chart)/charts-rechart-pie/two-simple-pie.jsx",
+    "app/pages/(chart)/(re-chart)/charts-rechart-radialbar/basic-radial-bar.jsx",
+    "app/pages/(chart)/(re-chart)/charts-rechart-bar/barchart-with-multixaxis.tsx"
   ],
   "exclude": [
     "node_modules"

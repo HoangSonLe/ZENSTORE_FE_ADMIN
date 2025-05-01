@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Runtime Configuration Editor</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+                    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                line-height: 1.6;
+            }
+            h1 {
+                color: #333;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+            input[type="text"],
+            textarea {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+            button {
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+            .alert {
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 4px;
+            }
+            .alert-success {
+                background-color: #dff0d8;
+                color: #3c763d;
+                border: 1px solid #d6e9c6;
+            }
+            .alert-danger {
+                background-color: #f2dede;
+                color: #a94442;
+                border: 1px solid #ebccd1;
+            }
+            .hidden {
+                display: none;
+            }
+            .code-editor {
+                font-family: monospace;
+                height: 300px;
+                white-space: pre;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Runtime Configuration Editor</h1>
+
+        <div id="success-message" class="alert alert-success hidden">
+            Configuration saved successfully! The changes will take effect when users reload the
+            page.
+        </div>
+
+        <div id="error-message" class="alert alert-danger hidden">
+            Error saving configuration. Please check the console for details.
+        </div>
+
+        <div class="form-group">
+            <label for="base-url">Base URL (without trailing slash):</label>
+            <input type="text" id="base-url" placeholder="https://client.zenstores.com.vn" />
+        </div>
+
+        <div class="form-group">
+            <label for="api-url">API URL:</label>
+            <input type="text" id="api-url" placeholder="https://10.0.0.11:44368" />
+        </div>
+
+        <div class="form-group">
+            <label for="debug">Debug Mode:</label>
+            <select id="debug">
+                <option value="false">Disabled</option>
+                <option value="true">Enabled</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="use-relative-paths">Use Relative Paths (helps avoid 403 errors):</label>
+            <select id="use-relative-paths">
+                <option value="true">Enabled</option>
+                <option value="false">Disabled</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="use-blob-for-special-chunks"
+                >Use Blob URLs for Special Chunks (helps with parentheses in paths):</label
+            >
+            <select id="use-blob-for-special-chunks">
+                <option value="true">Enabled</option>
+                <option value="false">Disabled</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="version">Version:</label>
+            <input type="text" id="version" placeholder="1.0.0" />
+        </div>
+
+        <div class="form-group">
+            <label for="config-json">Full Configuration (JSON):</label>
+            <textarea id="config-json" class="code-editor"></textarea>
+        </div>
+
+        <button id="save-button">Save Configuration</button>
+        <button id="download-button">Download Configuration File</button>
+
+        <script>
+            // Load the current configuration
+            function loadCurrentConfig() {
+                try {
+                    // Try to fetch the runtime-config.js file
+                    fetch("/runtime-config.js")
+                        .then((response) => response.text())
+                        .then((configText) => {
+                            // Extract the configuration object from the file
+                            const configMatch = configText.match(
+                                /window\.RUNTIME_CONFIG\s*=\s*(\{[\s\S]*?\});/
+                            );
+                            if (configMatch && configMatch[1]) {
+                                try {
+                                    // Parse the configuration object
+                                    const configStr = configMatch[1]
+                                        .replace(/(\w+):/g, '"$1":')
+                                        .replace(/'/g, '"');
+                                    const config = JSON.parse(configStr);
+
+                                    // Populate the form fields
+                                    document.getElementById("base-url").value =
+                                        config.BASE_URL || "";
+                                    document.getElementById("api-url").value = config.API_URL || "";
+                                    document.getElementById("debug").value = config.DEBUG
+                                        ? "true"
+                                        : "false";
+                                    document.getElementById("use-relative-paths").value =
+                                        config.USE_RELATIVE_PATHS ? "true" : "false";
+                                    document.getElementById("use-blob-for-special-chunks").value =
+                                        config.USE_BLOB_FOR_SPECIAL_CHUNKS ? "true" : "false";
+                                    document.getElementById("version").value = config.VERSION || "";
+
+                                    // Populate the JSON editor
+                                    document.getElementById("config-json").value = JSON.stringify(
+                                        config,
+                                        null,
+                                        2
+                                    );
+                                } catch (e) {
+                                    console.error("Error parsing configuration:", e);
+                                    showError("Error parsing configuration: " + e.message);
+                                }
+                            } else {
+                                console.error("Could not extract configuration from file");
+                                showError("Could not extract configuration from file");
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error loading configuration:", error);
+                            showError("Error loading configuration: " + error.message);
+                        });
+                } catch (e) {
+                    console.error("Error in loadCurrentConfig:", e);
+                    showError("Error loading configuration: " + e.message);
+                }
+            }
+
+            // Save the configuration
+            function saveConfiguration() {
+                try {
+                    // Get values from form
+                    const baseUrl = document.getElementById("base-url").value.trim();
+                    const apiUrl = document.getElementById("api-url").value.trim();
+                    const debug = document.getElementById("debug").value === "true";
+                    const useRelativePaths =
+                        document.getElementById("use-relative-paths").value === "true";
+                    const useBlobForSpecialChunks =
+                        document.getElementById("use-blob-for-special-chunks").value === "true";
+                    const version = document.getElementById("version").value.trim();
+
+                    // Create the configuration object
+                    const config = {
+                        BASE_URL: baseUrl,
+                        API_URL: apiUrl,
+                        DEBUG: debug,
+                        USE_RELATIVE_PATHS: useRelativePaths,
+                        USE_BLOB_FOR_SPECIAL_CHUNKS: useBlobForSpecialChunks,
+                        VERSION: version,
+                        // Keep the problematic chunks list
+                        PROBLEMATIC_CHUNKS: [
+                            "/_next/static/chunks/app/(dashboard)/(apps)/blogs/page-",
+                            "/_next/static/chunks/app/(dashboard)/(apps)/products/page-",
+                            "/_next/static/chunks/app/(dashboard)/(apps)/banners/page-",
+                        ],
+                    };
+
+                    // Generate the configuration file content
+                    const configFileContent = `// This file can be modified after the build to change configuration values
+window.RUNTIME_CONFIG = ${JSON.stringify(config, null, 2)};`;
+
+                    // Create a download link for the configuration file
+                    const blob = new Blob([configFileContent], { type: "text/javascript" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "runtime-config.js";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    // Show success message
+                    showSuccess();
+                } catch (e) {
+                    console.error("Error saving configuration:", e);
+                    showError("Error saving configuration: " + e.message);
+                }
+            }
+
+            // Update the JSON editor when form fields change
+            function updateJsonEditor() {
+                try {
+                    const baseUrl = document.getElementById("base-url").value.trim();
+                    const apiUrl = document.getElementById("api-url").value.trim();
+                    const debug = document.getElementById("debug").value === "true";
+                    const useRelativePaths =
+                        document.getElementById("use-relative-paths").value === "true";
+                    const useBlobForSpecialChunks =
+                        document.getElementById("use-blob-for-special-chunks").value === "true";
+                    const version = document.getElementById("version").value.trim();
+
+                    const config = {
+                        BASE_URL: baseUrl,
+                        API_URL: apiUrl,
+                        DEBUG: debug,
+                        USE_RELATIVE_PATHS: useRelativePaths,
+                        USE_BLOB_FOR_SPECIAL_CHUNKS: useBlobForSpecialChunks,
+                        VERSION: version,
+                        // Keep the problematic chunks list
+                        PROBLEMATIC_CHUNKS: [
+                            "/_next/static/chunks/app/(dashboard)/(apps)/blogs/page-",
+                            "/_next/static/chunks/app/(dashboard)/(apps)/products/page-",
+                            "/_next/static/chunks/app/(dashboard)/(apps)/banners/page-",
+                        ],
+                    };
+
+                    document.getElementById("config-json").value = JSON.stringify(config, null, 2);
+                } catch (e) {
+                    console.error("Error updating JSON editor:", e);
+                }
+            }
+
+            // Update form fields when JSON editor changes
+            function updateFormFields() {
+                try {
+                    const jsonText = document.getElementById("config-json").value;
+                    const config = JSON.parse(jsonText);
+
+                    document.getElementById("base-url").value = config.BASE_URL || "";
+                    document.getElementById("api-url").value = config.API_URL || "";
+                    document.getElementById("debug").value = config.DEBUG ? "true" : "false";
+                    document.getElementById("use-relative-paths").value = config.USE_RELATIVE_PATHS
+                        ? "true"
+                        : "false";
+                    document.getElementById("use-blob-for-special-chunks").value =
+                        config.USE_BLOB_FOR_SPECIAL_CHUNKS ? "true" : "false";
+                    document.getElementById("version").value = config.VERSION || "";
+                } catch (e) {
+                    console.error("Error updating form fields:", e);
+                }
+            }
+
+            // Show success message
+            function showSuccess() {
+                const successMessage = document.getElementById("success-message");
+                const errorMessage = document.getElementById("error-message");
+
+                successMessage.classList.remove("hidden");
+                errorMessage.classList.add("hidden");
+
+                setTimeout(() => {
+                    successMessage.classList.add("hidden");
+                }, 5000);
+            }
+
+            // Show error message
+            function showError(message) {
+                const successMessage = document.getElementById("success-message");
+                const errorMessage = document.getElementById("error-message");
+
+                errorMessage.textContent = message;
+                errorMessage.classList.remove("hidden");
+                successMessage.classList.add("hidden");
+            }
+
+            // Initialize the page
+            document.addEventListener("DOMContentLoaded", () => {
+                // Load the current configuration
+                loadCurrentConfig();
+
+                // Add event listeners
+                document.getElementById("save-button").addEventListener("click", saveConfiguration);
+                document
+                    .getElementById("download-button")
+                    .addEventListener("click", saveConfiguration);
+
+                // Add event listeners for form fields
+                document.getElementById("base-url").addEventListener("input", updateJsonEditor);
+                document.getElementById("api-url").addEventListener("input", updateJsonEditor);
+                document.getElementById("debug").addEventListener("change", updateJsonEditor);
+                document
+                    .getElementById("use-relative-paths")
+                    .addEventListener("change", updateJsonEditor);
+                document
+                    .getElementById("use-blob-for-special-chunks")
+                    .addEventListener("change", updateJsonEditor);
+                document.getElementById("version").addEventListener("input", updateJsonEditor);
+
+                // Add event listener for JSON editor
+                document.getElementById("config-json").addEventListener("input", updateFormFields);
+            });
+        </script>
+    </body>
+</html>

@@ -70,7 +70,7 @@ const Footer = () => {
                             variant="outline"
                             className="rounded text-primary-foreground border-primary"
                         >
-                            <Link href="/products" target="__blank">
+                            <Link href="/pages/products" target="__blank">
                                 View Demo
                             </Link>
                         </Button>

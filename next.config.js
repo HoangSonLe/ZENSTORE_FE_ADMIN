@@ -1,5 +1,12 @@
 /** @type {import('next').NextConfig} */
 
+// Determine the asset prefix based on the environment
+// This will be overridden at runtime by runtime-config.js
+const isProd = process.env.NODE_ENV === "production";
+const assetPrefix = isProd
+    ? process.env.NEXT_PUBLIC_BASE_URL || "https://client.zenstores.com.vn"
+    : "";
+
 const nextConfig = {
     // Add performance optimizations
     reactStrictMode: true,
@@ -10,15 +17,19 @@ const nextConfig = {
     },
     // Optimize compilation
     // Note: removeConsole is disabled for Turbopack compatibility
-    ...(process.env.NODE_ENV === "production"
+    ...(isProd
         ? {
               compiler: {
                   removeConsole: true,
               },
           }
         : {}),
-    // Reduce build output
-    output: "standalone",
+    // Enable static exports
+    output: "export",
+    // Set the asset prefix for production
+    assetPrefix: assetPrefix,
+    // Set the base path if your app is not hosted at the root
+    // basePath: '',
     poweredByHeader: false,
     // Fix TinyMCE issues
     transpilePackages: ["@tinymce/tinymce-react", "tinymce"],
@@ -83,9 +94,22 @@ const nextConfig = {
                 hostname: "10.0.0.11",
             },
         ],
-        // Set unoptimized to true only in development mode
-        unoptimized: process.env.NODE_ENV === "development",
+        // For static exports, images must be unoptimized
+        unoptimized: true,
     },
+    // Disable server-only features for static export
+    trailingSlash: true,
+    // Skip type checking during build for faster builds
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
+    // Exclude specific pages from the build
+    experimental: {
+        // Add any valid experimental options here if needed
+    },
+
+    // Note: rewrites don't work with static exports (output: "export")
+    // We'll use client-side redirects instead
 };
 
 module.exports = nextConfig;

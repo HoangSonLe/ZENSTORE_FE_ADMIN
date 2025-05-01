@@ -1,0 +1,9 @@
+// Middleware is not supported in static exports
+// This file has been renamed to prevent it from being used in static builds
+
+// If you need to re-enable middleware, rename this file back to middleware.ts
+// and remove the "output: export" option from next.config.js
+
+export const config = {
+    matcher: [],
+};

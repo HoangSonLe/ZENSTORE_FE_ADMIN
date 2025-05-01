@@ -27,7 +27,7 @@ const ErrorPage = () => {
                         changed or is temporarily unavailable.
                     </div>
                     <Button asChild className="mt-9  md:min-w-[300px]" size="lg">
-                        <Link href="/products">Go to Homepage</Link>
+                        <Link href="/pages/products">Go to Homepage</Link>
                     </Button>
                 </div>
             </div>

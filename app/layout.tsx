@@ -10,6 +10,14 @@ import "./assets/scss/globals.scss";
 import "./assets/scss/theme.scss";
 import "./styles/z-index-fixes.css";
 import "./styles/ckeditor-fixes.css";
+import Script from "next/script";
+import dynamic from "next/dynamic";
+
+// Import the chunk error handler with no SSR
+const ChunkErrorHandler = dynamic(() => import("@/components/chunk-error-handler"), {
+    ssr: false,
+});
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -28,11 +36,19 @@ export default function RootLayout({
     params: { lang: string };
 }) {
     return (
-        <html lang={lang}>
+        <html lang={lang} className={inter.className}>
+            <head>
+                {/* Load runtime config first, then path config */}
+                <Script src="/runtime-config.js" strategy="beforeInteractive" />
+                <Script src="/path-config.js" strategy="beforeInteractive" />
+            </head>
             <AuthProvider>
                 <TanstackProvider>
                     <Providers>
-                        <DirectionProvider lang={lang}>{children}</DirectionProvider>
+                        <DirectionProvider lang={lang}>
+                            <ChunkErrorHandler />
+                            {children}
+                        </DirectionProvider>
                     </Providers>
                 </TanstackProvider>
             </AuthProvider>

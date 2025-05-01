@@ -55,7 +55,7 @@ const CommingSoonPage = () => {
                     />
                 </div>
                 <Button asChild variant="outline" size="lg">
-                    <Link href="/products">Contact Us</Link>
+                    <Link href="/pages/products">Contact Us</Link>
                 </Button>
             </div>
             {/* main */}

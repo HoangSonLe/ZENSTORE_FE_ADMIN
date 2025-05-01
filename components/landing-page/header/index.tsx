@@ -131,7 +131,7 @@ const Header = () => {
             }
         >
             <nav className="container flex justify-between">
-                <Link target="_blank" href="/products" className="flex items-center gap-1">
+                <Link target="_blank" href="/pages/products" className="flex items-center gap-1">
                     <SiteLogo className="h-8 w-8  text-primary" />
                     <span className="text-primary-500 font-medium text-xl">DashTail</span>
                 </Link>
