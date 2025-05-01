@@ -114,8 +114,8 @@
                 >Use Blob URLs for Special Chunks (helps with parentheses in paths):</label
             >
             <select id="use-blob-for-special-chunks">
-                <option value="true">Enabled</option>
                 <option value="false">Disabled</option>
+                <option value="true">Enabled</option>
             </select>
         </div>
 
@@ -211,12 +211,8 @@
                         USE_RELATIVE_PATHS: useRelativePaths,
                         USE_BLOB_FOR_SPECIAL_CHUNKS: useBlobForSpecialChunks,
                         VERSION: version,
-                        // Keep the problematic chunks list
-                        PROBLEMATIC_CHUNKS: [
-                            "/_next/static/chunks/app/(dashboard)/(apps)/blogs/page-",
-                            "/_next/static/chunks/app/(dashboard)/(apps)/products/page-",
-                            "/_next/static/chunks/app/(dashboard)/(apps)/banners/page-",
-                        ],
+                        // Empty problematic chunks list since project doesn't have problematic chunks anymore
+                        PROBLEMATIC_CHUNKS: [],
                     };
 
                     // Generate the configuration file content
@@ -261,12 +257,8 @@ window.RUNTIME_CONFIG = ${JSON.stringify(config, null, 2)};`;
                         USE_RELATIVE_PATHS: useRelativePaths,
                         USE_BLOB_FOR_SPECIAL_CHUNKS: useBlobForSpecialChunks,
                         VERSION: version,
-                        // Keep the problematic chunks list
-                        PROBLEMATIC_CHUNKS: [
-                            "/_next/static/chunks/app/(dashboard)/(apps)/blogs/page-",
-                            "/_next/static/chunks/app/(dashboard)/(apps)/products/page-",
-                            "/_next/static/chunks/app/(dashboard)/(apps)/banners/page-",
-                        ],
+                        // Empty problematic chunks list since project doesn't have problematic chunks anymore
+                        PROBLEMATIC_CHUNKS: [],
                     };
 
                     document.getElementById("config-json").value = JSON.stringify(config, null, 2);

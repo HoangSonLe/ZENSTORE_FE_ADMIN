@@ -15,12 +15,10 @@ window.RUNTIME_CONFIG = {
     USE_RELATIVE_PATHS: true,
 
     // List of problematic chunks that need special handling
-    PROBLEMATIC_CHUNKS: [
-        "/_next/static/chunks/app/(dashboard)/(apps)/blogs/page-",
-        "/_next/static/chunks/app/(dashboard)/(apps)/products/page-",
-        "/_next/static/chunks/app/(dashboard)/(apps)/banners/page-",
-    ],
+    // Empty array since project doesn't have problematic chunks anymore
+    PROBLEMATIC_CHUNKS: [],
 
     // Use blob URLs for chunks with special characters
-    USE_BLOB_FOR_SPECIAL_CHUNKS: true,
+    // Disabled since there are no problematic chunks
+    USE_BLOB_FOR_SPECIAL_CHUNKS: false,
 };
