@@ -1,8 +1,8 @@
 export const metadata = {
-  title: "Authentication",
+    title: "Đăng nhập",
 };
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
+    return <>{children}</>;
 };
 
 export default Layout;

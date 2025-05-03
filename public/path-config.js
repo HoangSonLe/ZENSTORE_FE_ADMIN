@@ -1,5 +1,5 @@
 // This file helps configure paths for the static export
-// It uses the runtime-config.js values which can be modified after build
+// It uses the env-config.js values which are generated from .env files
 
 // Load the chunk proxy script
 (function () {
@@ -9,23 +9,28 @@
     document.head.appendChild(script);
 })();
 
-// Wait for runtime config to be loaded
+// Wait for environment config to be loaded
 (function () {
     function setupPathConfig() {
-        // Check if runtime config is available
-        if (typeof window.RUNTIME_CONFIG === "undefined") {
+        // Check if environment config is available
+        if (typeof window.ENV_CONFIG === "undefined") {
             // If not available yet, wait and try again
-            console.log("Waiting for runtime config to load...");
+            console.log("Waiting for environment config to load...");
             setTimeout(setupPathConfig, 100);
             return;
         }
 
-        // Set asset prefix from runtime config
-        window.__NEXT_ASSET_PREFIX__ = window.RUNTIME_CONFIG.BASE_URL || "";
+        // Create a backward compatibility layer for old code
+        if (typeof window.RUNTIME_CONFIG === "undefined") {
+            window.RUNTIME_CONFIG = window.ENV_CONFIG;
+        }
+
+        // Set asset prefix from environment config
+        window.__NEXT_ASSET_PREFIX__ = window.ENV_CONFIG.BASE_URL || "";
         console.log("Asset prefix set to:", window.__NEXT_ASSET_PREFIX__);
 
         // Use relative paths if configured to do so
-        const useRelativePaths = window.RUNTIME_CONFIG.USE_RELATIVE_PATHS || false;
+        const useRelativePaths = window.ENV_CONFIG.USE_RELATIVE_PATHS || false;
         console.log("Using relative paths:", useRelativePaths);
 
         // Helper function to fix chunk loading paths
@@ -48,10 +53,10 @@
                 const isProblematicChunk =
                     url.includes("(") ||
                     url.includes(")") ||
-                    window.RUNTIME_CONFIG.PROBLEMATIC_CHUNKS.some((chunk) => url.includes(chunk));
+                    window.ENV_CONFIG.PROBLEMATIC_CHUNKS.some((chunk) => url.includes(chunk));
 
                 // If it's a problematic chunk and we're using blob for special chunks
-                if (isProblematicChunk && window.RUNTIME_CONFIG.USE_BLOB_FOR_SPECIAL_CHUNKS) {
+                if (isProblematicChunk && window.ENV_CONFIG.USE_BLOB_FOR_SPECIAL_CHUNKS) {
                     console.log("Handling problematic chunk via proxy:", url);
 
                     // If the chunk proxy is loaded, use it
@@ -124,14 +129,14 @@
                         const isProblematicChunk =
                             value.includes("(") ||
                             value.includes(")") ||
-                            window.RUNTIME_CONFIG.PROBLEMATIC_CHUNKS.some((chunk) =>
+                            window.ENV_CONFIG.PROBLEMATIC_CHUNKS.some((chunk) =>
                                 value.includes(chunk)
                             );
 
                         // If it's a problematic chunk and we're using blob for special chunks
                         if (
                             isProblematicChunk &&
-                            window.RUNTIME_CONFIG.USE_BLOB_FOR_SPECIAL_CHUNKS &&
+                            window.ENV_CONFIG.USE_BLOB_FOR_SPECIAL_CHUNKS &&
                             window.__loadChunkViaBlob
                         ) {
                             console.log("Handling problematic script via proxy:", value);
@@ -201,14 +206,14 @@
                     const isProblematicChunk =
                         failingScript.includes("(") ||
                         failingScript.includes(")") ||
-                        window.RUNTIME_CONFIG.PROBLEMATIC_CHUNKS.some((chunk) =>
+                        window.ENV_CONFIG.PROBLEMATIC_CHUNKS.some((chunk) =>
                             failingScript.includes(chunk)
                         );
 
                     // If it's a problematic chunk and we're using blob for special chunks
                     if (
                         isProblematicChunk &&
-                        window.RUNTIME_CONFIG.USE_BLOB_FOR_SPECIAL_CHUNKS &&
+                        window.ENV_CONFIG.USE_BLOB_FOR_SPECIAL_CHUNKS &&
                         window.__loadChunkViaBlob
                     ) {
                         console.log("Handling failing script via proxy:", failingScript);

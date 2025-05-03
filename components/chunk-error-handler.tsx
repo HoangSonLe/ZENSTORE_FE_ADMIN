@@ -2,10 +2,23 @@
 
 import { useEffect } from "react";
 
-// Define the global runtime config type
+// Define the global environment config type
 declare global {
     interface Window {
-        RUNTIME_CONFIG: {
+        ENV_CONFIG: {
+            API_URL: string;
+            SITE_NAME: string;
+            AUTH_ENABLED: boolean;
+            SESSION_TIMEOUT: number;
+            BASE_URL: string;
+            USE_RELATIVE_PATHS: boolean;
+            PROBLEMATIC_CHUNKS: string[];
+            USE_BLOB_FOR_SPECIAL_CHUNKS: boolean;
+            DEBUG: boolean;
+            VERSION: string;
+        };
+        // Keep RUNTIME_CONFIG for backward compatibility
+        RUNTIME_CONFIG?: {
             BASE_URL: string;
             API_URL: string;
             DEBUG: boolean;
@@ -28,8 +41,9 @@ export default function ChunkErrorHandler() {
             ) {
                 console.warn("Chunk loading error detected, attempting to reload the page");
 
-                // Get the base URL from runtime config
-                const baseUrl = window.RUNTIME_CONFIG?.BASE_URL || "";
+                // Get the base URL from environment config
+                const baseUrl =
+                    window.ENV_CONFIG?.BASE_URL || window.RUNTIME_CONFIG?.BASE_URL || "";
                 console.log("Using base URL for chunk loading:", baseUrl);
 
                 // Clear cache by removing problematic script tags

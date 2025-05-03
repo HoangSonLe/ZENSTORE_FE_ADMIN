@@ -38,8 +38,8 @@ export default function RootLayout({
     return (
         <html lang={lang} className={inter.className}>
             <head>
-                {/* Load runtime config first, then path config */}
-                <Script src="/runtime-config.js" strategy="beforeInteractive" />
+                {/* Load environment config */}
+                <Script src="/env-config.js" strategy="beforeInteractive" />
                 <Script src="/path-config.js" strategy="beforeInteractive" />
             </head>
             <AuthProvider>

@@ -3,14 +3,22 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LayoutLoader from "@/components/layout-loader";
+import { useAuth } from "@/context/auth-context";
 
 const Page = () => {
     const router = useRouter();
+    const { isAuthenticated, loading } = useAuth();
 
-    // Redirect to products page on client side
+    // Redirect based on authentication status
     useEffect(() => {
-        router.push("/pages/products");
-    }, [router]);
+        if (!loading) {
+            if (isAuthenticated) {
+                router.push("/pages/products");
+            } else {
+                router.push("/auth/login");
+            }
+        }
+    }, [router, isAuthenticated, loading]);
 
     // Show a loading indicator while redirecting
     return <LayoutLoader />;

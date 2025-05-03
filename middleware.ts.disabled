@@ -4,6 +4,48 @@
 // If you need to re-enable middleware, rename this file back to middleware.ts
 // and remove the "output: export" option from next.config.js
 
+// Original middleware code (kept for reference):
+/*
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // Get the pathname of the request
+  const path = request.nextUrl.pathname;
+
+  // Define public paths that don't require authentication
+  const isPublicPath = path.startsWith('/auth') ||
+                       path === '/' ||
+                       path.startsWith('/_next') ||
+                       path.startsWith('/images') ||
+                       path.startsWith('/api');
+
+  // Get the token from cookies
+  const token = request.cookies.get('authToken')?.value;
+
+  // If the path is not public and there's no token, redirect to login
+  if (!isPublicPath && !token) {
+    return NextResponse.redirect(new URL('/auth/login', request.url));
+  }
+
+  // If the path is login and there's a token, redirect to dashboard
+  if (path === '/auth/login' && token) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  return NextResponse.next();
+}
+
+// Configure the middleware to run on specific paths
+export const config = {
+  matcher: [
+    // Match all paths except for static files, api routes, etc.
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.jpg$).*)',
+  ],
+};
+*/
+
+// Empty config to prevent any middleware execution
 export const config = {
     matcher: [],
 };

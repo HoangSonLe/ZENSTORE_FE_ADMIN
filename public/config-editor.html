@@ -125,6 +125,19 @@
         </div>
 
         <div class="form-group">
+            <label for="auth-enabled">Authentication:</label>
+            <select id="auth-enabled">
+                <option value="true">Enabled</option>
+                <option value="false">Disabled</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="session-timeout">Session Timeout (minutes):</label>
+            <input type="number" id="session-timeout" placeholder="5" min="1" />
+        </div>
+
+        <div class="form-group">
             <label for="config-json">Full Configuration (JSON):</label>
             <textarea id="config-json" class="code-editor"></textarea>
         </div>
@@ -164,6 +177,12 @@
                                     document.getElementById("use-blob-for-special-chunks").value =
                                         config.USE_BLOB_FOR_SPECIAL_CHUNKS ? "true" : "false";
                                     document.getElementById("version").value = config.VERSION || "";
+                                    document.getElementById("auth-enabled").value =
+                                        config.AUTH_ENABLED !== false ? "true" : "false";
+                                    document.getElementById("session-timeout").value =
+                                        config.SESSION_TIMEOUT
+                                            ? Math.floor(config.SESSION_TIMEOUT / (60 * 1000))
+                                            : "5";
 
                                     // Populate the JSON editor
                                     document.getElementById("config-json").value = JSON.stringify(
@@ -202,6 +221,10 @@
                     const useBlobForSpecialChunks =
                         document.getElementById("use-blob-for-special-chunks").value === "true";
                     const version = document.getElementById("version").value.trim();
+                    const authEnabled = document.getElementById("auth-enabled").value === "true";
+                    const sessionTimeoutMinutes =
+                        parseInt(document.getElementById("session-timeout").value, 10) || 5;
+                    const sessionTimeout = sessionTimeoutMinutes * 60 * 1000; // Convert to milliseconds
 
                     // Create the configuration object
                     const config = {
@@ -211,6 +234,9 @@
                         USE_RELATIVE_PATHS: useRelativePaths,
                         USE_BLOB_FOR_SPECIAL_CHUNKS: useBlobForSpecialChunks,
                         VERSION: version,
+                        // Authentication settings
+                        AUTH_ENABLED: authEnabled,
+                        SESSION_TIMEOUT: sessionTimeout,
                         // Empty problematic chunks list since project doesn't have problematic chunks anymore
                         PROBLEMATIC_CHUNKS: [],
                     };
@@ -249,6 +275,10 @@ window.RUNTIME_CONFIG = ${JSON.stringify(config, null, 2)};`;
                     const useBlobForSpecialChunks =
                         document.getElementById("use-blob-for-special-chunks").value === "true";
                     const version = document.getElementById("version").value.trim();
+                    const authEnabled = document.getElementById("auth-enabled").value === "true";
+                    const sessionTimeoutMinutes =
+                        parseInt(document.getElementById("session-timeout").value, 10) || 5;
+                    const sessionTimeout = sessionTimeoutMinutes * 60 * 1000; // Convert to milliseconds
 
                     const config = {
                         BASE_URL: baseUrl,
@@ -257,6 +287,9 @@ window.RUNTIME_CONFIG = ${JSON.stringify(config, null, 2)};`;
                         USE_RELATIVE_PATHS: useRelativePaths,
                         USE_BLOB_FOR_SPECIAL_CHUNKS: useBlobForSpecialChunks,
                         VERSION: version,
+                        // Authentication settings
+                        AUTH_ENABLED: authEnabled,
+                        SESSION_TIMEOUT: sessionTimeout,
                         // Empty problematic chunks list since project doesn't have problematic chunks anymore
                         PROBLEMATIC_CHUNKS: [],
                     };
@@ -282,6 +315,11 @@ window.RUNTIME_CONFIG = ${JSON.stringify(config, null, 2)};`;
                     document.getElementById("use-blob-for-special-chunks").value =
                         config.USE_BLOB_FOR_SPECIAL_CHUNKS ? "true" : "false";
                     document.getElementById("version").value = config.VERSION || "";
+                    document.getElementById("auth-enabled").value =
+                        config.AUTH_ENABLED !== false ? "true" : "false";
+                    document.getElementById("session-timeout").value = config.SESSION_TIMEOUT
+                        ? Math.floor(config.SESSION_TIMEOUT / (60 * 1000))
+                        : "5";
                 } catch (e) {
                     console.error("Error updating form fields:", e);
                 }
@@ -332,6 +370,12 @@ window.RUNTIME_CONFIG = ${JSON.stringify(config, null, 2)};`;
                     .getElementById("use-blob-for-special-chunks")
                     .addEventListener("change", updateJsonEditor);
                 document.getElementById("version").addEventListener("input", updateJsonEditor);
+                document
+                    .getElementById("auth-enabled")
+                    .addEventListener("change", updateJsonEditor);
+                document
+                    .getElementById("session-timeout")
+                    .addEventListener("input", updateJsonEditor);
 
                 // Add event listener for JSON editor
                 document.getElementById("config-json").addEventListener("input", updateFormFields);

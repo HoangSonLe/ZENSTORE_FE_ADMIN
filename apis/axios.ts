@@ -2,11 +2,45 @@ import { IApiResponse, IApiService } from "./interface";
 import axios, { AxiosResponse } from "axios";
 import queryString from "query-string";
 import env from "../constants/env";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast as stoast } from "sonner";
+
+// Define the global environment config type
+declare global {
+    interface Window {
+        ENV_CONFIG?: {
+            API_URL: string;
+            SITE_NAME: string;
+            AUTH_ENABLED: boolean;
+            SESSION_TIMEOUT: number;
+            BASE_URL: string;
+        };
+        RUNTIME_CONFIG?: {
+            API_URL: string;
+            BASE_URL: string;
+        };
+    }
+}
+
+// Get API URL from environment or runtime config if available
+const getApiUrl = () => {
+    if (typeof window !== "undefined") {
+        // First try ENV_CONFIG (new approach)
+        if (window.ENV_CONFIG?.API_URL) {
+            return window.ENV_CONFIG.API_URL;
+        }
+        // Fall back to RUNTIME_CONFIG (backward compatibility)
+        if (window.RUNTIME_CONFIG?.API_URL) {
+            return window.RUNTIME_CONFIG.API_URL;
+        }
+    }
+    // Default to env from constants
+    return env.API_URL;
+};
+
 // Create an Axios instance
 const axiosInstance = axios.create({
-    baseURL: env.API_URL, // Change this to your API URL
+    baseURL: getApiUrl(), // Get API URL from config
     timeout: 10000,
 });
 
