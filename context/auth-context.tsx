@@ -101,10 +101,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, []);
 
+    // Function to clear all items from localStorage
+    const clearAllStorage = () => {
+        console.log("Clearing localStorage items due to session expiration");
+
+        // Instead of using localStorage.clear() which removes everything,
+        // we'll selectively remove items to maintain better control
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("lastActivity");
+        localStorage.removeItem("tempAuthFlow");
+
+        // Remove other app-specific items
+        localStorage.removeItem("sidebar-store");
+        localStorage.removeItem("theme-store");
+
+        // Note: We're not using localStorage.clear() to avoid removing any items
+        // that might be needed on the lock screen or by other parts of the app
+    };
+
     // Check if session has expired
     const checkSessionExpiration = () => {
         // If authentication is disabled, never expire the session
         if (!authEnabled) return false;
+
+        // If already marked as expired, don't check again
+        if (isSessionExpired) return true;
 
         const lastActivity = localStorage.getItem("lastActivity");
         const authToken = localStorage.getItem("authToken");
@@ -119,7 +140,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (isExpired) {
             console.log("Session expired, redirecting to lock page");
             setIsSessionExpired(true);
-
+            clearAllStorage();
             // Force a redirect to lock page using window.location for more reliable navigation
             window.location.href = "/auth/lock";
             return true;
@@ -322,8 +343,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Mark session as expired
         setIsSessionExpired(true);
 
-        // Clear the token but keep the user info for the lock screen
-        localStorage.removeItem("authToken");
+        // Clear all localStorage items
+        clearAllStorage();
 
         // Clear the cookie by setting it to expire in the past
         document.cookie =
@@ -335,10 +356,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Set up activity monitoring
     useEffect(() => {
-        // Check session expiration every minute
-        const intervalId = setInterval(() => {
-            checkSessionExpiration();
-        }, 60 * 1000);
+        let intervalId: NodeJS.Timeout | null = null;
+
+        // Only set up the interval if not already expired
+        if (!isSessionExpired) {
+            // Check session expiration every minute
+            intervalId = setInterval(() => {
+                checkSessionExpiration();
+            }, 60 * 1000);
+        }
 
         // Update activity on user interactions
         const updateActivity = () => {
@@ -354,7 +380,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         window.addEventListener("mousemove", updateActivity);
 
         return () => {
-            clearInterval(intervalId);
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
             window.removeEventListener("click", updateActivity);
             window.removeEventListener("keypress", updateActivity);
             window.removeEventListener("scroll", updateActivity);
