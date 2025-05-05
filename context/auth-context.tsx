@@ -5,6 +5,7 @@ import { apiService } from "@/apis/axios";
 import toast from "react-hot-toast";
 import authApi from "@/apis/auth/auth.api";
 import env from "@/constants/env";
+import { useApi } from "@/hooks/useApi";
 
 // Add environment config type definition
 declare global {
@@ -70,6 +71,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Authentication enabled flag (from environment variables or runtime config)
     const [authEnabled, setAuthEnabled] = useState(env.AUTH_ENABLED);
+
+    // Set up API hooks
+    const { request: authByCodeRequest, loading: authLoading } = useApi(authApi.authByCode);
 
     // Update configuration from environment config if available
     useEffect(() => {
@@ -161,22 +165,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 }
 
                 // Try to get user info
-                try {
-                    const userData = await getUserInfo();
-                    setUser(userData);
-                    updateLastActivity();
-                } catch (error) {
-                    console.error("Error fetching user info:", error);
+                // try {
+                //     const userData = await getUserInfo();
+                //     setUser(userData);
+                //     updateLastActivity();
+                // } catch (error) {
+                //     console.error("Error fetching user info:", error);
 
-                    // If we can't get user info but have a token, use default user
-                    setUser({
-                        id: 1,
-                        name: "Default User",
-                        email: "user@example.com",
-                        image: "/images/avatar/avatar-3.jpg",
-                    });
-                    updateLastActivity();
-                }
+                //     // If we can't get user info but have a token, use default user
+                //     setUser({
+                //         id: 1,
+                //         name: "Default User",
+                //         email: "user@example.com",
+                //         image: "/images/avatar/avatar-3.jpg",
+                //     });
+                //     updateLastActivity();
+                // }
+                setUser({
+                    id: 1,
+                    name: "Default User",
+                    email: "user@example.com",
+                    image: "/images/avatar/avatar-3.jpg",
+                });
+                updateLastActivity();
             } catch (error) {
                 console.error("Authentication error:", error);
                 setUser(null);
@@ -236,7 +247,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Authenticate with code function (for both login and lock screen)
     const authByCode = async (code: string): Promise<boolean> => {
         try {
-            setLoading(true);
             console.log("Authenticating with code:", code);
 
             // Validate the code - in a real app, this would check against a backend
@@ -246,64 +256,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 return false;
             }
 
-            // For development purposes, we'll simulate a successful authentication
-            try {
-                // Attempt to call the API (this might fail in development)
-                const response = await authApi.authByCode({
-                    method: "POST",
-                    params: { code },
-                });
-
-                if (response && response.value) {
+            // Attempt to call the API using the useApi hook
+            // Note: The hook handles loading state internally
+            await authByCodeRequest(
+                {
+                    method: "GET",
+                    params: { key: code },
+                },
+                // Success callback
+                (response) => {
                     // Update token
-                    const token = response.value;
+                    const token = "auth-token-" + Date.now();
                     localStorage.setItem("authToken", token);
                     document.cookie = `authToken=${token}; path=/; max-age=86400`;
+
+                    // Clear the temporary auth flow flag if it exists
+                    localStorage.removeItem("tempAuthFlow");
+
+                    // Reset session expiration
+                    updateLastActivity();
+                    setIsSessionExpired(false);
+
+                    // Get user info
+                    // try {
+                    //     const userData = await getUserInfo();
+                    //     setUser(userData);
+                    // } catch (error) {
+                    //     // If API fails, use existing user or default
+                    //     setUser({
+                    //         id: 1,
+                    //         name: "Default User",
+                    //         email: "user@example.com",
+                    //         image: "/images/avatar/avatar-3.jpg",
+                    //     });
+                    // }
+
+                    setUser({
+                        id: 1,
+                        name: "Default User",
+                        email: "user@example.com",
+                        image: "/images/avatar/avatar-3.jpg",
+                    });
+
+                    toast.success("Đăng nhập thành công");
+
+                    // Use window.location for more reliable navigation
+                    window.location.href = "/pages/products";
+                    return true;
+                },
+                // Error callback
+                (error) => {
+                    console.error("Auth code error:", error);
+                    // toast.error("Xác thực thất bại. Vui lòng thử lại.");
                 }
-            } catch (apiError) {
-                console.log("API call failed, using development fallback");
-                // Generate a token for development
-                const token = "auth-token-" + Date.now();
-                localStorage.setItem("authToken", token);
+            );
 
-                // Set the cookie with a secure path and expiration
-                const expiryDate = new Date();
-                expiryDate.setDate(expiryDate.getDate() + 1); // 1 day expiry
-                document.cookie = `authToken=${token}; path=/; expires=${expiryDate.toUTCString()}; SameSite=Strict`;
-            }
-
-            // Clear the temporary auth flow flag if it exists
-            localStorage.removeItem("tempAuthFlow");
-
-            // Reset session expiration
-            updateLastActivity();
-            setIsSessionExpired(false);
-
-            // Get user info
-            try {
-                const userData = await getUserInfo();
-                setUser(userData);
-            } catch (error) {
-                // If API fails, use existing user or default
-                setUser({
-                    id: 1,
-                    name: "Default User",
-                    email: "user@example.com",
-                    image: "/images/avatar/avatar-3.jpg",
-                });
-            }
-
-            toast.success("Đăng nhập thành công");
-
-            // Use window.location for more reliable navigation
-            window.location.href = "/dashboard";
-            return true;
-        } catch (error: any) {
-            console.error("Auth code error:", error);
-            toast.error("Xác thực thất bại. Vui lòng thử lại.");
             return false;
-        } finally {
-            setLoading(false);
+        } catch (error: any) {
+            return false;
         }
     };
 
@@ -352,9 +362,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
     }, [isSessionExpired]);
 
+    // Combine loading states
+    const combinedLoading = loading || authLoading;
+
     const value = {
         user,
-        loading,
+        loading: combinedLoading,
         login,
         logout,
         authByCode,

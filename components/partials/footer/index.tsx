@@ -87,7 +87,7 @@ const FooterContent = () => {
             </p>
             <p className="mb-0 text-xs md:text-sm">
                 Phần mềm được thiết kế và phát triển bởi{" "}
-                <a className="text-primary" target="__blank" href="/">
+                <a className="text-primary" target="__blank" href="tel:0782065079">
                     3TS
                 </a>
             </p>

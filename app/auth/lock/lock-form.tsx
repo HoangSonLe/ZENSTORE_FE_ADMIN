@@ -47,11 +47,7 @@ const LockForm = () => {
     // Handle form submission (for both login and lock screen)
     const onSubmit = (data: FormValues) => {
         startTransition(async () => {
-            console.log("Submitting code:", data.code);
-            const success = await authByCode(data.code);
-            if (!success) {
-                toast.error("Xác thực thất bại. Vui lòng thử lại.");
-            }
+            await authByCode(data.code);
         });
     };
 

@@ -151,12 +151,13 @@ export interface IApiTable<T> {
     pageSize: number;
     total: number;
 }
-
-export interface IApiResponse<T> {
-    data: T;
+export interface IBaseApiResponse {
     isSuccess: boolean;
     errorMessageList: string[];
     successMessageList: string[];
+}
+export interface IApiResponse<T> extends IBaseApiResponse {
+    data: T;
 }
 
 export interface IApiResponseTable<T> extends IApiResponse<IApiTable<T>> {
