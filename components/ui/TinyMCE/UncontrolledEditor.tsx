@@ -147,7 +147,7 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
                     plugins: plugins,
                     toolbar: toolbar,
                     content_style:
-                        "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
+                        "body { font-family:Helvetica,Arial,sans-serif; font-size:18px }",
                     noneditable_class: "mceNonEditable",
                     toolbar_mode: "sliding",
                     contextmenu: "link image table",

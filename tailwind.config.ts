@@ -145,19 +145,19 @@ const config = {
                 slideRightAndFade: "slideRightAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)",
             },
             fontSize: {
-                xs: ["0.875rem", { lineHeight: "1.25rem" }], // Increased from 0.75rem
-                sm: ["1rem", { lineHeight: "1.5rem" }], // Increased from 0.875rem
-                base: ["1.125rem", { lineHeight: "1.75rem" }], // Increased from 1rem
-                lg: ["1.25rem", { lineHeight: "1.75rem" }], // Increased from 1.125rem
-                xl: ["1.375rem", { lineHeight: "1.75rem" }], // Increased from 1.25rem
-                "2xl": ["1.625rem", { lineHeight: "2rem" }], // Increased from 1.5rem
-                "3xl": ["1.875rem", { lineHeight: "2.25rem" }], // Increased from 1.875rem
-                "4xl": ["2.25rem", { lineHeight: "2.5rem" }], // Increased from 2.25rem
-                "5xl": ["3rem", { lineHeight: "1" }], // Increased from 3rem
-                "6xl": ["3.75rem", { lineHeight: "1" }], // Increased from 3.75rem
-                "7xl": ["4.5rem", { lineHeight: "1" }], // Increased from 4.5rem
-                "8xl": ["6rem", { lineHeight: "1" }], // Increased from 6rem
-                "9xl": ["8rem", { lineHeight: "1" }], // Increased from 8rem
+                xs: ["1rem", { lineHeight: "1.5rem" }], // Further increased
+                sm: ["1.125rem", { lineHeight: "1.75rem" }], // Further increased
+                base: ["1.25rem", { lineHeight: "1.75rem" }], // Further increased
+                lg: ["1.5rem", { lineHeight: "2rem" }], // Further increased
+                xl: ["1.75rem", { lineHeight: "2.25rem" }], // Further increased
+                "2xl": ["2rem", { lineHeight: "2.5rem" }], // Further increased
+                "3xl": ["2.25rem", { lineHeight: "2.75rem" }], // Further increased
+                "4xl": ["2.5rem", { lineHeight: "3rem" }], // Further increased
+                "5xl": ["3.5rem", { lineHeight: "1" }], // Further increased
+                "6xl": ["4.25rem", { lineHeight: "1" }], // Further increased
+                "7xl": ["5rem", { lineHeight: "1" }], // Further increased
+                "8xl": ["6.5rem", { lineHeight: "1" }], // Further increased
+                "9xl": ["8.5rem", { lineHeight: "1" }], // Further increased
             },
         },
     },

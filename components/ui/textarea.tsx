@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Radius, Shadow, TextAreaColor, TextAreaVariant } from "@/lib/type";
 
 export const textareaVariants = cva(
-    "flex flex-1 bg-background w-full min-h-[80px]   px-3 py-[10px] text-base  file:border-0 file:bg-transparent file:text-base file:font-medium  read-only:bg-background  disabled:cursor-not-allowed disabled:opacity-50  transition duration-300 ",
+    "flex flex-1 bg-background w-full min-h-[80px]   px-3 py-[10px] text-lg  file:border-0 file:bg-transparent file:text-lg file:font-medium  read-only:bg-background  disabled:cursor-not-allowed disabled:opacity-50  transition duration-300 ",
     {
         variants: {
             color: {

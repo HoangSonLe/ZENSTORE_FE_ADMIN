@@ -28,9 +28,9 @@ const breadcrumbItemsVariants = cva(" flex gap-1 items-center transition  underl
             focus: "focus:underline",
         },
         size: {
-            md: "text-lg",
-            sm: "text-base",
-            lg: "text-xl",
+            md: "text-xl",
+            sm: "text-lg",
+            lg: "text-2xl",
         },
     },
 
