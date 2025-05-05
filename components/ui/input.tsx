@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 
 //py-[10px]
 export const inputVariants = cva(
-    " w-full   bg-background  border-default-300 dark:border-700  px-3 h-9   text-sm  file:border-0 file:bg-transparent file:text-sm file:font-medium  read-only:leading-9 read-only:bg-background  disabled:cursor-not-allowed disabled:opacity-50  transition duration-300 ",
+    " w-full   bg-background  border-default-300 dark:border-700  px-3 h-9   text-base  file:border-0 file:bg-transparent file:text-base file:font-medium  read-only:leading-9 read-only:bg-background  disabled:cursor-not-allowed disabled:opacity-50  transition duration-300 ",
     {
         variants: {
             color: {
@@ -46,10 +46,10 @@ export const inputVariants = cva(
                 xl: "rounded-[20px]",
             },
             size: {
-                sm: "h-8 text-xs read-only:leading-8",
-                md: "h-9 text-xs read-only:leading-9",
-                lg: "h-10 text-sm read-only:leading-10",
-                xl: "h-12 text-base read-only:leading-[48px]",
+                sm: "h-8 text-sm read-only:leading-8",
+                md: "h-9 text-base read-only:leading-9",
+                lg: "h-10 text-lg read-only:leading-10",
+                xl: "h-12 text-xl read-only:leading-[48px]",
             },
         },
         compoundVariants: [

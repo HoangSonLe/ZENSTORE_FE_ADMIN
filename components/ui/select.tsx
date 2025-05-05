@@ -46,10 +46,10 @@ const selectVariants = cva(
                 xl: "rounded-[20px]",
             },
             size: {
-                sm: "h-8 text-xs",
-                md: "h-9 text-xs",
-                lg: "h-10 text-sm",
-                xl: "h-12 text-base",
+                sm: "h-8 text-sm",
+                md: "h-9 text-base",
+                lg: "h-10 text-lg",
+                xl: "h-12 text-xl",
             },
         },
         compoundVariants: [
@@ -183,7 +183,7 @@ const SelectLabel = React.forwardRef<
     <SelectPrimitive.Label
         ref={ref}
         className={cn(
-            "py-1.5 ltr:pl-8 rtl:pr-8 ltr:pr-2 rtl:pl-2 text-sm font-semibold",
+            "py-1.5 ltr:pl-8 rtl:pr-8 ltr:pr-2 rtl:pl-2 text-base font-semibold",
             className
         )}
         {...props}
@@ -198,7 +198,7 @@ const SelectItem = React.forwardRef<
     <SelectPrimitive.Item
         ref={ref}
         className={cn(
-            "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+            "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-base outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
             className
         )}
         {...props}

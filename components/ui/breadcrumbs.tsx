@@ -28,15 +28,15 @@ const breadcrumbItemsVariants = cva(" flex gap-1 items-center transition  underl
             focus: "focus:underline",
         },
         size: {
-            md: "text-base",
-            sm: "text-sm",
-            lg: "text-lg",
+            md: "text-lg",
+            sm: "text-base",
+            lg: "text-xl",
         },
     },
 
     defaultVariants: {
         color: "default",
-        size: "sm",
+        size: "md",
         underline: "none",
     },
 });
