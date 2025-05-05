@@ -8,13 +8,7 @@ import { DataTableColumnHeader } from "@/components/table/advanced/components/da
 import { renderDate, renderImage, renderText } from "@/components/table/cell-renderers";
 import { ColumnDef } from "@tanstack/react-table";
 import { Fragment, useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import {
-    BasicDialog as Dialog,
-    BasicDialogContent as DialogContent,
-    BasicDialogHeader as DialogHeader,
-    BasicDialogTitle as DialogTitle,
-} from "@/components/ui/basic-dialog";
+import { useApi } from "@/hooks/useApi";
 import { toast } from "sonner";
 import UpdateBannerDetail from "./components/update-banner-detail";
 import { CommonTableResponse } from "@/components/table/CommonTable";
@@ -22,6 +16,9 @@ import { EBannerOrder } from "@/constants/enum";
 
 export default function BannerTable() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+    // Set up API hooks
+    const { request: getBannerList } = useApi(bannerApi.getBannerList);
 
     // Function to fetch banners from API - using useCallback to prevent infinite re-renders
     const fetchBanners = useCallback(
@@ -41,37 +38,50 @@ export default function BannerTable() {
                     }
                 }
 
-                const response = await bannerApi.getBannerList({ params: queryParams });
-
                 // Create a properly typed response
                 const result: CommonTableResponse<IBanner> = {
                     data: [],
                     total: 0,
                 };
 
-                // Safely extract data if it exists
-                if (response.data && response.isSuccess) {
-                    // Extract the banner array from the nested data structure
-                    // Use type assertion to handle the complex nested structure
-                    const banners = response.data.data as unknown as IBanner[];
-                    if (Array.isArray(banners)) {
-                        result.data = banners;
-                    }
+                // Use the useApi hook to make the API call
+                await getBannerList(
+                    { params: queryParams },
+                    // Success callback
+                    (response: any) => {
+                        // Safely extract data if it exists
+                        if (response.data && response.isSuccess) {
+                            // Extract the banner array from the nested data structure
+                            // Use type assertion to handle the complex nested structure
+                            const banners = response.data.data as unknown as IBanner[];
+                            if (Array.isArray(banners)) {
+                                result.data = banners;
+                            }
 
-                    // Extract the total count
-                    if (typeof response.data.total === "number") {
-                        result.total = response.data.total;
+                            // Extract the total count
+                            if (typeof response.data.total === "number") {
+                                result.total = response.data.total;
+                            }
+                        }
+                    },
+                    // Error callback
+                    (error) => {
+                        console.error("Error fetching banners:", error);
+                        toast.error("Lỗi khi tải danh sách banner");
                     }
-                }
+                );
 
                 return result;
             } catch (error) {
-                console.error("Error fetching banners:", error);
+                console.error("Error in fetchBanners:", error);
                 toast.error("Lỗi khi tải danh sách banner");
-                throw error;
+                return {
+                    data: [],
+                    total: 0,
+                };
             }
         },
-        []
+        [getBannerList] // Add getBannerList to dependencies
     );
 
     // Define columns for the banner table

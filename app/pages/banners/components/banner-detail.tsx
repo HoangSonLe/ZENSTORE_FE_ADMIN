@@ -18,9 +18,11 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { EBannerOrder } from "@/constants/enum";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import BannerFileUploader from "./banner-file-uploader";
+import { useApi } from "@/hooks/useApi";
+import { useAsyncEffect } from "@/hooks";
 
 interface FileWithPreview extends File {
     preview: string;
@@ -55,38 +57,46 @@ export default function BannerDetail({
 }: BannerDetailProps) {
     const [formData, setFormData] = useState<IBannerCreateOrUpdate>(initialData);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingBanner, setIsLoadingBanner] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [showValidationError, setShowValidationError] = useState(false);
 
+    // Set up API hooks
+    const { request: getBannerDetail, loading: isLoadingBanner } = useApi(
+        bannerApi.getBannerDetail
+    );
+
     // Fetch banner data by ID
     const fetchBannerData = async (id: number) => {
-        setIsLoadingBanner(true);
         try {
-            const response = await bannerApi.getBannerDetail({
-                params: { bannerId: id },
-            });
-
-            if (response.isSuccess && response.data) {
-                // Update form data with fetched banner
-                setFormData({
-                    ...response.data,
-                });
-            } else {
-                toast.error("Không thể tải thông tin banner");
-            }
+            // Use the useApi hook to make the API call
+            await getBannerDetail(
+                { params: { bannerId: id } },
+                // Success callback
+                (response: any) => {
+                    if (response.isSuccess && response.data) {
+                        // Update form data with fetched banner
+                        setFormData({
+                            ...response.data,
+                        });
+                    } else {
+                        toast.error("Không thể tải thông tin banner");
+                    }
+                },
+                // Error callback
+                (error) => {
+                    console.error("Error fetching banner data:", error);
+                    toast.error("Lỗi khi tải thông tin banner");
+                }
+            );
         } catch (error) {
-            console.error("Error fetching banner data:", error);
-            toast.error("Lỗi khi tải thông tin banner");
-        } finally {
-            setIsLoadingBanner(false);
+            console.error("Error in fetchBannerData:", error);
         }
     };
 
-    // Load banner data if ID is provided
-    useEffect(() => {
+    // Load banner data if ID is provided using useAsyncEffect
+    useAsyncEffect(async () => {
         if (bannerId && bannerId > 0) {
-            fetchBannerData(bannerId);
+            await fetchBannerData(bannerId);
         }
     }, [bannerId]);
 

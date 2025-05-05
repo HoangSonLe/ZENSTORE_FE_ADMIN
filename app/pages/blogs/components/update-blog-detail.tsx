@@ -4,6 +4,7 @@ import blogApi from "@/apis/blog/blog.api";
 import { IBlog, IBlogCreateOrUpdate } from "@/apis/blog/blog.interface";
 import { toast } from "sonner";
 import BlogDetail from "./blog-detail";
+import { useApi } from "@/hooks/useApi";
 
 interface UpdateBlogDetailProps {
     blog: IBlog;
@@ -11,11 +12,10 @@ interface UpdateBlogDetailProps {
     onSuccess?: () => void;
 }
 
-export default function UpdateBlogDetail({
-    blog,
-    onClose,
-    onSuccess,
-}: UpdateBlogDetailProps) {
+export default function UpdateBlogDetail({ blog, onClose, onSuccess }: UpdateBlogDetailProps) {
+    // Set up API hooks
+    const { request: updateBlog, loading: isUpdating } = useApi(blogApi.createOrUpdateBlogDetail);
+
     const handleUpdateBlog = async (blogData: IBlogCreateOrUpdate) => {
         try {
             // Merge the existing blog with the updated data
@@ -24,21 +24,30 @@ export default function UpdateBlogDetail({
                 ...blogData,
             };
 
-            // Call the API to update the blog
-            await blogApi.createOrUpdateBlogDetail({
-                body: updatedBlog,
-            });
+            // Call the API to update the blog using the useApi hook
+            await updateBlog(
+                {
+                    body: updatedBlog,
+                    method: "POST",
+                },
+                // Success callback
+                () => {
+                    toast.success("Bài viết đã được cập nhật thành công");
 
-            toast.success("Bài viết đã được cập nhật thành công");
-
-            // Call the onSuccess callback if provided
-            if (onSuccess) {
-                onSuccess();
-            }
+                    // Call the onSuccess callback if provided
+                    if (onSuccess) {
+                        onSuccess();
+                    }
+                },
+                // Error callback
+                (error) => {
+                    console.error("Error updating blog:", error);
+                    toast.error("Lỗi cập nhật bài viết");
+                }
+            );
         } catch (error) {
-            console.error("Error updating blog:", error);
+            console.error("Error in handleUpdateBlog:", error);
             toast.error("Lỗi cập nhật bài viết");
-            throw error;
         }
     };
 

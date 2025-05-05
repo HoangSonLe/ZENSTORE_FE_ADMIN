@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BasicDialogFooter as DialogFooter } from "@/components/ui/basic-dialog";
 import { Loader2, AlertCircle } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import {
     Select,
     SelectContent,

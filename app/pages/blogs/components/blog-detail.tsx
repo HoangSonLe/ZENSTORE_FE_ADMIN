@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { IBlog, IBlogCreateOrUpdate } from "@/apis/blog/blog.interface";
+import { useState } from "react";
+import { IBlogCreateOrUpdate } from "@/apis/blog/blog.interface";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,12 +13,9 @@ import BlogFileUploader from "./blog-file-uploader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import blogApi from "@/apis/blog/blog.api";
-import { IApiResponse } from "@/apis/interface";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-interface FileWithPreview extends File {
-    preview: string;
-}
+import { useApi } from "@/hooks/useApi";
+import { useAsyncEffect } from "@/hooks";
 
 export interface BlogDetailProps {
     newsId?: number;
@@ -47,55 +44,62 @@ export default function BlogDetail({
     loadingText,
 }: BlogDetailProps) {
     const [formData, setFormData] = useState<IBlogCreateOrUpdate>(initialData);
-    const [blogImages, setBlogImages] = useState<FileWithPreview[]>([]);
     const [actualFileObjects, setActualFileObjects] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingBlog, setIsLoadingBlog] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [showValidationError, setShowValidationError] = useState(false);
 
+    // Set up API hooks
+    const { request: getBlogDetail, loading: isLoadingBlog } = useApi(blogApi.getBlogDetail);
+
     // Fetch blog data by ID
     const fetchBlogData = async (id: number) => {
-        setIsLoadingBlog(true);
         try {
-            const response = await blogApi.getBlogDetail({
-                params: { newId: id },
-            });
+            // Use the useApi hook to make the API call
+            await getBlogDetail(
+                { params: { newId: id } },
+                // Success callback
+                (response: any) => {
+                    if (response.isSuccess && response.data) {
+                        // Prepare data with existing image
+                        const blogData = {
+                            ...response.data,
+                            // If uploadFile doesn't exist, use empty string
+                            uploadFile: response.data.uploadFile || "",
+                            // Ensure newsThumbnail is a valid URL or empty string
+                            newsThumbnail: response.data.newsThumbnail || "",
+                        } as IBlogCreateOrUpdate;
 
-            if (response.isSuccess && response.data) {
-                // Prepare data with existing image
-                const blogData = {
-                    ...response.data,
-                    // If uploadFile doesn't exist, use empty string
-                    uploadFile: response.data.uploadFile || "",
-                    // Ensure newsThumbnail is a valid URL or empty string
-                    newsThumbnail: response.data.newsThumbnail || "",
-                } as IBlogCreateOrUpdate;
+                        // Validate newsThumbnail URL
+                        if (blogData.newsThumbnail) {
+                            try {
+                                new URL(blogData.newsThumbnail);
+                            } catch (error) {
+                                console.warn("Invalid newsThumbnail URL:", blogData.newsThumbnail);
+                                blogData.newsThumbnail = ""; // Reset to empty string if invalid
+                            }
+                        }
 
-                // Validate newsThumbnail URL
-                if (blogData.newsThumbnail) {
-                    try {
-                        new URL(blogData.newsThumbnail);
-                    } catch (error) {
-                        console.warn("Invalid newsThumbnail URL:", blogData.newsThumbnail);
-                        blogData.newsThumbnail = ""; // Reset to empty string if invalid
+                        setFormData(blogData);
+                    } else {
+                        toast.error("Không thể tải thông tin bài viết");
                     }
+                },
+                // Error callback
+                (error) => {
+                    console.error("Error fetching blog data:", error);
+                    toast.error("Lỗi khi tải thông tin bài viết");
                 }
-
-                setFormData(blogData);
-            }
+            );
         } catch (error) {
-            console.error("Error fetching blog data:", error);
-            toast.error("Lỗi khi tải thông tin bài viết");
-        } finally {
-            setIsLoadingBlog(false);
+            console.error("Error in fetchBlogData:", error);
         }
     };
 
-    // Load blog data if ID is provided
-    useEffect(() => {
+    // Load blog data if ID is provided using useAsyncEffect
+    useAsyncEffect(async () => {
         if (newsId && newsId > 0) {
-            fetchBlogData(newsId);
+            await fetchBlogData(newsId);
         }
     }, [newsId]);
 
@@ -223,6 +227,14 @@ export default function BlogDetail({
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>Vui lòng điền đủ dữ liệu trước khi lưu.</AlertDescription>
                 </Alert>
+            )}
+
+            {/* Loading Indicator */}
+            {isLoadingBlog && (
+                <div className="mb-4 flex items-center justify-center p-4 bg-blue-50 rounded-md">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-500" />
+                    <span className="text-blue-500">Đang tải thông tin bài viết...</span>
+                </div>
             )}
 
             {/* Required Fields Note */}

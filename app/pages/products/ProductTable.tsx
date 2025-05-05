@@ -85,6 +85,10 @@ export default function ProductTable() {
         }
     };
 
+    // Set up API hooks
+    const { request: getProductList } = useApi(productApi.getProductList);
+    const { request: deleteProductById } = useApi(productApi.deleteProductById);
+
     // Function to fetch products from the API
     const fetchProducts = async (params: IProductQuery) => {
         // console.log("Fetching products with params:", params);
@@ -100,14 +104,27 @@ export default function ProductTable() {
 
             // console.log("Mapped API params:", apiParams);
 
-            // Call the real API
-            const response = await productApi.getProductList({
-                params: apiParams,
-            });
-            return {
-                data: response.data.data,
-                total: response.data.total,
+            // Call the API using useApi hook
+            let result = {
+                data: [],
+                total: 0,
             };
+
+            await getProductList(
+                { params: apiParams },
+                (response: any) => {
+                    result = {
+                        data: response.data.data,
+                        total: response.data.total,
+                    };
+                },
+                (error) => {
+                    console.error("Error fetching products:", error);
+                    toast.error("Tải dữ liệu sản phẩm lỗi");
+                }
+            );
+
+            return result;
         } catch (error) {
             console.error("Error fetching products:", error);
             toast.error("Tải dữ liệu sản phẩm lỗi");
@@ -121,18 +138,22 @@ export default function ProductTable() {
     // Handler for deleting a product
     const handleDeleteProduct = async (product: IProduct) => {
         try {
-            // Call the API to delete the product
-            await productApi.deleteProductById({
-                params: { productId: product.productId },
-            });
-
-            // Trigger a refresh of the table data
-            setRefreshTrigger((prev) => prev + 1);
-
-            toast.success("Xóa sản phẩm thành công");
+            // Call the API to delete the product using useApi hook
+            await deleteProductById(
+                { params: { productId: product.productId } },
+                () => {
+                    // Trigger a refresh of the table data
+                    setRefreshTrigger((prev) => prev + 1);
+                    toast.success("Xóa sản phẩm thành công");
+                },
+                (error) => {
+                    console.error("Error deleting product:", error);
+                    toast.error("Lỗi xóa sản phẩm");
+                    throw error;
+                }
+            );
         } catch (error) {
             console.error("Error deleting product:", error);
-            // toast.error("Lỗi xóa sản phẩm");
             throw error;
         }
     };

@@ -9,6 +9,7 @@ import { Search, FileText } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import templateApi from "@/apis/template/template.api";
 import { ITemplate, ITemplateQuery } from "@/apis/template/template.interface";
+import { useApi } from "@/hooks/useApi";
 
 interface InsertTemplateButtonProps {
     className?: string;
@@ -30,10 +31,11 @@ const InsertTemplateButton: React.FC<InsertTemplateButtonProps> = ({
 }) => {
     const [open, setOpen] = useState(false);
     const [searchText, setSearchText] = useState("");
-    const [templates, setTemplates] = useState<ITemplate[]>([]);
     const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
     const [selectedTemplate, setSelectedTemplate] = useState<ITemplate | null>(null);
-    const [loading, setLoading] = useState(false);
+
+    // Set up API hooks
+    const { request: getTemplateList, loading } = useApi(templateApi.GetTemplateList);
 
     // Fetch templates when modal opens
     useEffect(() => {
@@ -55,27 +57,31 @@ const InsertTemplateButton: React.FC<InsertTemplateButtonProps> = ({
 
     // Fetch templates from API
     const fetchTemplates = async () => {
-        setLoading(true);
         try {
-            const response = await templateApi.GetTemplateList({
-                params: {
-                    templateCode: searchText || undefined,
-                    pageNumber: 1,
-                    pageSize: 100,
+            // Use the useApi hook to make the API call
+            await getTemplateList(
+                {
+                    params: {
+                        templateCode: searchText || undefined,
+                        pageNumber: 1,
+                        pageSize: 100,
+                    },
                 },
-            });
-
-            if (response.isSuccess && response.data) {
-                setTemplates(response.data.data);
-
-                // Convert templates to tree structure
-                const tree = convertToTreeData(response.data.data);
-                setTreeData(tree);
-            }
+                // Success callback
+                (response: any) => {
+                    if (response.isSuccess && response.data) {
+                        // Convert templates to tree structure
+                        const tree = convertToTreeData(response.data.data);
+                        setTreeData(tree);
+                    }
+                },
+                // Error callback
+                (error) => {
+                    console.error("Error fetching templates:", error);
+                }
+            );
         } catch (error) {
-            console.error("Error fetching templates:", error);
-        } finally {
-            setLoading(false);
+            console.error("Error in fetchTemplates:", error);
         }
     };
 

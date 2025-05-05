@@ -13,14 +13,13 @@ import {
 } from "@/components/table/cell-renderers";
 import { ColumnDef } from "@tanstack/react-table";
 import { Fragment, useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { useApi } from "@/hooks/useApi";
 import {
     BasicDialog as Dialog,
     BasicDialogContent as DialogContent,
     BasicDialogHeader as DialogHeader,
     BasicDialogTitle as DialogTitle,
 } from "@/components/ui/basic-dialog";
-import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import CreateBlogDetail from "./components/create-blog-detail";
 import UpdateBlogDetail from "./components/update-blog-detail";
@@ -29,6 +28,10 @@ import { CommonTableResponse } from "@/components/table/CommonTable";
 export default function BlogTable() {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+    // Set up API hooks
+    const { request: getBlogList } = useApi(blogApi.getBlogList);
+    const { request: deleteBlog } = useApi(blogApi.deleteBlog);
 
     // Function to fetch blogs from API - using useCallback to prevent infinite re-renders
     const fetchBlogs = useCallback(
@@ -48,48 +51,71 @@ export default function BlogTable() {
                     }
                 }
 
-                const response = await blogApi.getBlogList({ params: queryParams });
-
                 // Create a properly typed response
                 const result: CommonTableResponse<IBlog> = {
                     data: [],
                     total: 0,
                 };
 
-                // Safely extract data if it exists
-                if (response.data && response.isSuccess) {
-                    // Extract the blog array from the nested data structure
-                    // Use type assertion to handle the complex nested structure
-                    const blogs = response.data.data as unknown as IBlog[];
-                    if (Array.isArray(blogs)) {
-                        result.data = blogs;
-                    }
+                // Use the useApi hook to make the API call
+                await getBlogList(
+                    { params: queryParams },
+                    // Success callback
+                    (response: any) => {
+                        // Safely extract data if it exists
+                        if (response.data && response.isSuccess) {
+                            // Extract the blog array from the nested data structure
+                            // Use type assertion to handle the complex nested structure
+                            const blogs = response.data.data as unknown as IBlog[];
+                            if (Array.isArray(blogs)) {
+                                result.data = blogs;
+                            }
 
-                    // Extract the total count
-                    if (typeof response.data.total === "number") {
-                        result.total = response.data.total;
+                            // Extract the total count
+                            if (typeof response.data.total === "number") {
+                                result.total = response.data.total;
+                            }
+                        }
+                    },
+                    // Error callback
+                    (error) => {
+                        console.error("Error fetching blogs:", error);
+                        toast.error("Lỗi khi tải danh sách bài viết");
                     }
-                }
+                );
 
                 return result;
             } catch (error) {
-                console.error("Error fetching blogs:", error);
+                console.error("Error in fetchBlogs:", error);
                 toast.error("Lỗi khi tải danh sách bài viết");
-                throw error;
+                return {
+                    data: [],
+                    total: 0,
+                };
             }
         },
-        []
+        [getBlogList] // Add getBlogList to dependencies
     );
 
     // Function to handle blog deletion
     const handleDeleteBlog = async (blog: IBlog) => {
         try {
-            // Implement delete functionality when API is available
-            await blogApi.deleteBlog({ params: { newId: blog.newsId } });
-            toast.success("Xóa bài viết thành công");
-            setRefreshTrigger((prev) => prev + 1);
+            // Use the useApi hook to delete the blog
+            await deleteBlog(
+                { params: { newId: blog.newsId } },
+                // Success callback
+                () => {
+                    toast.success("Xóa bài viết thành công");
+                    setRefreshTrigger((prev) => prev + 1);
+                },
+                // Error callback
+                (error) => {
+                    console.error("Error deleting blog:", error);
+                    toast.error("Lỗi khi xóa bài viết");
+                }
+            );
         } catch (error) {
-            console.error("Error deleting blog:", error);
+            console.error("Error in handleDeleteBlog:", error);
             toast.error("Lỗi khi xóa bài viết");
         }
     };
@@ -161,6 +187,7 @@ export default function BlogTable() {
                             onSuccess={() => setRefreshTrigger((prev) => prev + 1)}
                         />
                     )}
+                    onDelete={(blog) => handleDeleteBlog(blog as IBlog)}
                 />
             ),
             size: 100,
