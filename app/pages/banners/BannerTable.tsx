@@ -106,7 +106,6 @@ export default function BannerTable() {
             header: ({ column }) => <DataTableColumnHeader column={column} title="Tên" />,
             cell: ({ row }) => renderText(row, "bannerName"),
             size: 200,
-            enableSorting: false,
         },
         {
             accessorKey: "bannerTitle",
@@ -127,7 +126,6 @@ export default function BannerTable() {
             header: ({ column }) => <DataTableColumnHeader column={column} title="Vị trí" />,
             cell: ({ row }) => renderText(row, "bannerTypeName"),
             size: 120,
-            enableSorting: false,
         },
         {
             accessorKey: "updatedAt",
@@ -154,11 +152,12 @@ export default function BannerTable() {
         },
     ];
 
-    // Define sort mapping for the banner table
-    const sortMapping: Record<string, number> = {
-        bannerId: 1,
-        bannerName: 2,
-        updatedAt: 3,
+    // Define sort mapping for the banner table using the model-based approach
+    // Only include columns that are actually sortable (not explicitly disabled with enableSorting: false)
+    const sortMapping: Record<string, string> = {
+        bannerName: "bannerName",
+        bannerTypeName: "bannerTypeName",
+        updatedAt: "updatedAt",
     };
 
     // Define initial filters

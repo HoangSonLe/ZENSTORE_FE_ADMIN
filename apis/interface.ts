@@ -63,6 +63,7 @@ interface IDefaultTableQueryParams {
     current?: number;
     pageSize?: number;
     sorter?: string;
+    directionSort?: number | null;
     timeRange?: [string, string];
 }
 
@@ -73,7 +74,7 @@ type ExcludeKeys<T, K> = {
 
 type IExtraTableQueryParams = ExcludeKeys<
     IDefaultTableQueryParams,
-    "current" | "pageSize" | "sorter" | "timeRange"
+    "current" | "pageSize" | "sorter" | "directionSort" | "timeRange"
 > | null;
 
 // The combined type
@@ -143,6 +144,7 @@ export interface IPagingQuery {
     pageNumber: number;
     pageSize: number;
     sorter?: number;
+    directionSort?: number | null;
 }
 
 export interface IApiTable<T> {

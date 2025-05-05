@@ -266,11 +266,16 @@ export default function ProductTable() {
         },
     ];
 
-    // Define sort mapping for the product table
-    const sortMapping: Record<string, number> = {
-        productId: 1,
-        productName: 2,
-        // Add more mappings as needed
+    // Define sort mapping for the product table using the model-based approach
+    // Only include columns that are actually sortable (not explicitly disabled with enableSorting: false)
+    const sortMapping: Record<string, string> = {
+        productName: "productName",
+        productStatusCode: "productStatusCode",
+        productSpaceName: "productSpaceName",
+        productColorName: "productColorName",
+        productPriceSale: "productPriceSale",
+        productSeriesName: "productSeriesName",
+        updatedAt: "updatedAt",
     };
 
     // Define initial filters

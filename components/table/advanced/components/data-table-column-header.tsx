@@ -15,12 +15,28 @@ interface DataTableColumnHeaderProps {
     column: Column<any, any>;
     title: string;
     className?: string;
+    onSortingToggle?: (column: Column<any, any>, desc: boolean) => void;
 }
 
-export function DataTableColumnHeader({ column, title, className }: DataTableColumnHeaderProps) {
+export function DataTableColumnHeader({
+    column,
+    title,
+    className,
+    onSortingToggle,
+}: DataTableColumnHeaderProps) {
     if (!column.getCanSort()) {
         return <div className={cn(className)}>{title}</div>;
     }
+
+    const handleSortingToggle = (desc: boolean) => {
+        // First toggle the sorting in the table
+        column.toggleSorting(desc);
+
+        // Then call the API if the callback is provided
+        if (onSortingToggle) {
+            onSortingToggle(column, desc);
+        }
+    };
 
     return (
         <div className={cn("flex items-center space-x-2", className)}>
@@ -42,11 +58,11 @@ export function DataTableColumnHeader({ column, title, className }: DataTableCol
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                    <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
+                    <DropdownMenuItem onClick={() => handleSortingToggle(false)}>
                         <ChevronUp className="ltr:mr-2 rtl:ml-2 h-3.5 w-3.5 text-muted-foreground/70" />
                         Tăng dần
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
+                    <DropdownMenuItem onClick={() => handleSortingToggle(true)}>
                         <ChevronDown className="ltr:mr-2 rtl:ml-2 h-3.5 w-3.5 text-muted-foreground/70" />
                         Giảm dần
                     </DropdownMenuItem>

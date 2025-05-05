@@ -194,11 +194,11 @@ export default function BlogTable() {
         },
     ];
 
-    // Define sort mapping for the blog table
-    const sortMapping: Record<string, number> = {
-        newsId: 1,
-        newsTitle: 2,
-        createdAt: 3,
+    // Define sort mapping for the blog table using the model-based approach
+    // Only include columns that are actually sortable (not explicitly disabled with enableSorting: false)
+    const sortMapping: Record<string, string> = {
+        state: "state",
+        updatedAt: "updatedAt",
     };
 
     // Define state filter options

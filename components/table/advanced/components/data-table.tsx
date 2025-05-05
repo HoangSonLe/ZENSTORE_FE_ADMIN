@@ -57,6 +57,7 @@ interface DataTableProps<TData> {
     filters?: {
         [key: string]: FilterConfig;
     };
+    onSortingToggle?: (column: any, desc: boolean) => void; // New prop for direct API call on sorting toggle
 }
 
 export function DataTable<TData>({
@@ -71,6 +72,7 @@ export function DataTable<TData>({
     onSearchSubmit,
     onResetSearch,
     filters,
+    onSortingToggle,
 }: DataTableProps<TData>) {
     const [rowSelection, setRowSelection] = React.useState({});
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -93,9 +95,42 @@ export function DataTable<TData>({
         }
     }, [pagination?.pageIndex, pagination?.pageSize]);
 
+    // Enhance columns with onSortingToggle prop if provided
+    const enhancedColumns = React.useMemo(() => {
+        if (!onSortingToggle) return columns;
+
+        return columns.map((column) => {
+            // Only modify columns that have a header function
+            if (typeof column.header === "function") {
+                return {
+                    ...column,
+                    header: (props: any) => {
+                        // Get the original header component
+                        const originalHeader = column.header!(props);
+
+                        // If it's a DataTableColumnHeader component, we need to clone it and add the onSortingToggle prop
+                        if (
+                            originalHeader &&
+                            originalHeader.type &&
+                            originalHeader.type.name === "DataTableColumnHeader"
+                        ) {
+                            // Clone the element and add the onSortingToggle prop
+                            return React.cloneElement(originalHeader, { onSortingToggle });
+                        }
+
+                        // Otherwise, return the original header
+                        return originalHeader;
+                    },
+                };
+            }
+
+            return column;
+        });
+    }, [columns, onSortingToggle]);
+
     const table = useReactTable({
         data,
-        columns,
+        columns: enhancedColumns,
         state: {
             sorting,
             columnVisibility,

@@ -58,7 +58,8 @@ export interface CommonTableProps<T, Q extends CommonTableQuery> {
     onError?: (error: Error) => void;
 
     // Column mapping for sorting (maps column IDs to API sort parameters)
-    sortMapping?: Record<string, number>;
+    // Can be either number (for old sorter parameter)
+    sortMapping?: Record<string, number | string>;
 }
 
 export function CommonTable<T extends object, Q extends CommonTableQuery>({
@@ -120,6 +121,8 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
 
             // Convert TanStack Table sorting to API sorting format
             let sortParam: number | undefined = undefined;
+            let sorter: string | undefined = undefined;
+            let directionSort: number | null = null;
 
             if (sorting.length > 0) {
                 const column = sorting[0].id;
@@ -127,7 +130,14 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
 
                 // Use the sortMapping to determine the sort parameter
                 if (sortMapping[column]) {
-                    sortParam = sortMapping[column] * direction;
+                    // Check if sortMapping is a string (new model) or number (old model)
+                    if (typeof sortMapping[column] === "string") {
+                        sorter = sortMapping[column] as string;
+                        directionSort = direction;
+                    } else {
+                        // Fallback to the old sorting method
+                        sortParam = (sortMapping[column] as number) * direction;
+                    }
                 }
             }
 
@@ -140,7 +150,10 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
                 pageSize: pagination.pageSize,
                 // Only include searchString if it's not empty and not just whitespace
                 ...(safeSearchQuery !== "" ? { searchString: safeSearchQuery } : {}),
-                sorter: sortParam,
+                // Include appropriate sorting parameters based on what's available
+                ...(sortParam !== undefined ? { sorter: sortParam } : {}),
+                ...(sorter !== undefined ? { sorter: sorter } : {}),
+                ...(directionSort !== null ? { directionSort: directionSort } : {}),
                 // Add these mappings for APIs that expect different parameter names
                 current: pagination.pageNumber, // Some APIs expect 'current' instead of 'pageNumber'
                 ...Object.entries(filters).reduce((acc, [key, value]) => {
@@ -309,6 +322,89 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
         setSorting(newSorting);
     }, []);
 
+    // Handle direct API call when sorting is toggled via column header
+    const handleSortingToggle = useCallback(
+        (column: any, desc: boolean) => {
+            // Get the column ID
+            const columnId = column.id;
+
+            // Only proceed if we have a mapping for this column
+            if (sortMapping[columnId]) {
+                // Get the current state
+                const { pagination, searchQuery, filters } = stateRef.current;
+
+                // Create a safe copy of the search query
+                const safeSearchQuery = typeof searchQuery === "string" ? searchQuery.trim() : "";
+
+                // Calculate the direction
+                const direction = desc ? -1 : 1;
+
+                // Determine sorting parameters based on the type of mapping
+                let sortParam: number | undefined = undefined;
+                let sorter: string | undefined = undefined;
+                let directionSort: number | null = null;
+
+                // Check if sortMapping is a string (new model) or number (old model)
+                if (typeof sortMapping[columnId] === "string") {
+                    sorter = sortMapping[columnId] as string;
+                    directionSort = direction;
+                } else {
+                    // Fallback to the old sorting method
+                    sortParam = (sortMapping[columnId] as number) * direction;
+                }
+
+                // Prepare query parameters
+                const queryParams = {
+                    pageNumber: pagination.pageNumber,
+                    pageSize: pagination.pageSize,
+                    // Only include searchString if it's not empty
+                    ...(safeSearchQuery !== "" ? { searchString: safeSearchQuery } : {}),
+                    // Include appropriate sorting parameters based on what's available
+                    ...(sortParam !== undefined ? { sorter: sortParam } : {}),
+                    ...(sorter !== undefined ? { sorter: sorter } : {}),
+                    ...(directionSort !== null ? { directionSort: directionSort } : {}),
+                    // Add these mappings for APIs that expect different parameter names
+                    current: pagination.pageNumber,
+                    ...Object.entries(filters).reduce((acc, [key, value]) => {
+                        // Only include non-empty filters
+                        if (Array.isArray(value) && value.length > 0) {
+                            // Use the mapped key if available, otherwise use the original key
+                            const mappedKey = filterMapping[key] || key;
+                            acc[mappedKey] = value;
+                        } else if (value && typeof value === "string") {
+                            // Use the mapped key if available, otherwise use the original key
+                            const mappedKey = filterMapping[key] || key;
+                            acc[mappedKey] = value;
+                        }
+                        return acc;
+                    }, {} as Record<string, any>),
+                } as Q;
+
+                // Call the API directly
+                setIsLoading(true);
+                fetchData(queryParams)
+                    .then((response) => {
+                        // Process the API response
+                        setData(response.data);
+                        setPagination((prev) => ({
+                            ...prev,
+                            total: response.total,
+                        }));
+                    })
+                    .catch((err) => {
+                        console.error("Error fetching data on sort toggle:", err);
+                        if (onError && err instanceof Error) {
+                            onError(err);
+                        }
+                    })
+                    .finally(() => {
+                        setIsLoading(false);
+                    });
+            }
+        },
+        [fetchData, sortMapping, filterMapping, onError]
+    );
+
     const handleSearchChange = useCallback((value: string) => {
         // console.log("Search text changed:", value);
         setSearchText(value);
@@ -456,6 +552,7 @@ export function CommonTable<T extends object, Q extends CommonTableQuery>({
                 onReload={handleReload}
                 onResetSearch={handleResetSearch}
                 filters={tableFilters}
+                onSortingToggle={handleSortingToggle}
             />
         </Fragment>
     );
