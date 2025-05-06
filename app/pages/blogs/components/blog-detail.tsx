@@ -220,7 +220,7 @@ export default function BlogDetail({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-190px)]">
+        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-200px)]">
             {/* Validation Alert */}
             {showValidationError && Object.keys(errors).length > 0 && (
                 <Alert className="mb-4 bg-destructive/15 text-destructive">

@@ -484,7 +484,7 @@ export default function ProductDetail({
         }
     }, [formData]);
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-190px)]">
+        <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-200px)]">
             {isLoadingProduct && (
                 <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
