@@ -56,7 +56,6 @@ export default function UpdateProductDetail({
     return (
         <ProductDetail
             productId={product.productId}
-            initialData={product}
             onClose={onClose}
             onSubmit={handleUpdateProduct}
             submitButtonText="Lưu thay đổi"

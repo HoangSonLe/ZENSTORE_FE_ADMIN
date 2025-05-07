@@ -133,7 +133,7 @@ const UncontrolledEditor = forwardRef<UncontrolledEditorRef, UncontrolledEditorP
         const handleEditorChange = (content: string) => {
             onChange(content);
         };
-
+        console.log(value);
         return (
             <Editor
                 onInit={(_, editor) => {

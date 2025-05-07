@@ -274,6 +274,7 @@ export default function BlogDetail({
                         >
                             <ClientSideCustomEditor
                                 initialValue={formData.newsShortContent}
+                                value={formData.newsShortContent}
                                 onChange={(value) => handleEditorChange("newsShortContent", value)}
                                 height="300px"
                             />
@@ -319,6 +320,7 @@ export default function BlogDetail({
                         >
                             <ClientSideCustomEditor
                                 initialValue={formData.newsDetailContent}
+                                value={formData.newsDetailContent}
                                 onChange={(value) => handleEditorChange("newsDetailContent", value)}
                                 height="600px"
                             />

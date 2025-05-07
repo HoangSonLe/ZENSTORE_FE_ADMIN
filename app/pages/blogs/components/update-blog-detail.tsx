@@ -54,7 +54,6 @@ export default function UpdateBlogDetail({ blog, onClose, onSuccess }: UpdateBlo
     return (
         <BlogDetail
             newsId={blog.newsId}
-            initialData={blog as IBlogCreateOrUpdate}
             onClose={onClose}
             onSubmit={handleUpdateBlog}
             submitButtonText="Lưu thay đổi"
