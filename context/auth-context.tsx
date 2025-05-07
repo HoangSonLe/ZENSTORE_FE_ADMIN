@@ -162,9 +162,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 if (!authEnabled) {
                     setUser({
                         id: 1,
-                        name: "Default User",
+                        name: "Zen Store",
                         email: "user@example.com",
-                        image: "/images/avatar/avatar-3.jpg",
+                        image: "/images/avatar/logo-admin.jpg",
                     });
                     setLoading(false);
                     return;
@@ -196,17 +196,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 //     // If we can't get user info but have a token, use default user
                 //     setUser({
                 //         id: 1,
-                //         name: "Default User",
+                //         name: "Zen Store",
                 //         email: "user@example.com",
-                //         image: "/images/avatar/avatar-3.jpg",
+                //         image: "/images/avatar/logo-admin.jpg",
                 //     });
                 //     updateLastActivity();
                 // }
                 setUser({
                     id: 1,
-                    name: "Default User",
+                    name: "Zen Store",
                     email: "user@example.com",
-                    image: "/images/avatar/avatar-3.jpg",
+                    image: "/images/avatar/logo-admin.jpg",
                 });
                 updateLastActivity();
             } catch (error) {
@@ -245,9 +245,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             // Set a temporary user for the lock screen
             setUser({
                 id: 1,
-                name: "Default User",
+                name: "Zen Store",
                 email: email || "user@example.com",
-                image: "/images/avatar/avatar-3.jpg",
+                image: "/images/avatar/logo-admin.jpg",
             });
 
             // Set a temporary token to indicate we're in the authentication flow
@@ -306,17 +306,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     //     // If API fails, use existing user or default
                     //     setUser({
                     //         id: 1,
-                    //         name: "Default User",
+                    //         name: "Zen Store",
                     //         email: "user@example.com",
-                    //         image: "/images/avatar/avatar-3.jpg",
+                    //         image: "/images/avatar/logo-admin.jpg",
                     //     });
                     // }
 
                     setUser({
                         id: 1,
-                        name: "Default User",
+                        name: "Zen Store",
                         email: "user@example.com",
-                        image: "/images/avatar/avatar-3.jpg",
+                        image: "/images/avatar/logo-admin.jpg",
                     });
 
                     toast.success("Đăng nhập thành công");

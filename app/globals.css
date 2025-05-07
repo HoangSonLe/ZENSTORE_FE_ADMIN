@@ -43,15 +43,19 @@
     }
 
     /* Responsive height for table container */
+    .table-responsive-height {
+        max-height: calc(100vh - var(--header-height) - var(--footer-height) - 200px);
+    }
+
     @media (max-height: 768px) {
         .table-responsive-height {
-            max-height: 60vh;
+            max-height: calc(100vh - var(--header-height) - var(--footer-height) - 180px);
         }
     }
 
     @media (min-height: 769px) {
         .table-responsive-height {
-            max-height: 70vh;
+            max-height: calc(100vh - var(--header-height) - var(--footer-height) - 220px);
         }
     }
 

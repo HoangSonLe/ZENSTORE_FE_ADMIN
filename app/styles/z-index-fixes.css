@@ -66,3 +66,8 @@ div[id^="react-hot-toast"] {
 .tox-image-tools {
     z-index: 100001 !important;
 }
+
+/* Fix for sidebar logo height */
+.sidebar-logo-height {
+    height: fit-content !important;
+}

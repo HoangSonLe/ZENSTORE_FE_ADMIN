@@ -69,12 +69,12 @@ const LockForm = () => {
 
             <div className="mt-6 flex justify-center">
                 <Avatar className="h-[72px] w-[72px]">
-                    <AvatarImage src={user?.image || "/images/avatar/avatar-3.jpg"} alt="" />
+                    <AvatarImage src={user?.image || "/images/avatar/logo-admin.jpg"} alt="" />
                     <AvatarFallback>{user?.name?.substring(0, 2) || "UN"}</AvatarFallback>
                 </Avatar>
             </div>
             <div className="text-center mt-4 text-xl font-medium text-default-900">
-                {user?.name || "Người dùng"}
+                {user?.name || "Zen Store"}
             </div>
 
             <form className="2xl:mt-7 mt-8" onSubmit={handleSubmit(onSubmit)}>

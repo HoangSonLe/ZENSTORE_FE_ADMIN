@@ -218,8 +218,9 @@ export function DataTable<TData>({
                     <div
                         className="overflow-auto table-responsive-height w-full table-container"
                         style={{
-                            height: `${Math.min(pageSize * 41 + 60, 550)}px`,
+                            height: `calc(100vh - var(--header-height) - var(--footer-height) - 200px)`,
                             minHeight: "400px",
+                            // maxHeight: "70vh",
                         }}
                     >
                         {/* Table with auto layout for better content handling */}

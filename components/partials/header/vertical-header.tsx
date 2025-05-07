@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { SiteLogo } from "@/components/svg";
 import Link from "next/link";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const MenuBar = ({
     collapsed,
@@ -74,7 +75,10 @@ const VerticalHeader: React.FC<VerticalHeaderProps> = ({ handleOpenSearch }) => 
 
     const MainLogo = (
         <Link href="/pages/products" className=" text-primary ">
-            <SiteLogo className="h-7 w-7" />
+            <Avatar className=" h-7 w-7">
+                <AvatarImage src={"/images/avatar/logo-admin.jpg"} alt="" />
+                <AvatarFallback>{"ZN"}</AvatarFallback>
+            </Avatar>
         </Link>
     );
     const SearchButton = (

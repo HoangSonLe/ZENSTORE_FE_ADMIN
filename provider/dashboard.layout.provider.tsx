@@ -157,6 +157,7 @@ const LayoutWrapper = ({
     return (
         <>
             <motion.div
+                className="h-full"
                 key={location}
                 initial="pageInitial"
                 animate="pageAnimate"
@@ -181,7 +182,7 @@ const LayoutWrapper = ({
                     duration: 0.5,
                 }}
             >
-                <main>{children}</main>
+                <main className="h-full">{children}</main>
             </motion.div>
 
             <MobileSidebar trans={trans} className="left-[300px]" />

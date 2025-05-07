@@ -2,20 +2,14 @@
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/auth-context";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
-import Link from "next/link";
-import { useAuth } from "@/context/auth-context";
 
 const ProfileInfo = () => {
     const { user, logout } = useAuth();
@@ -47,14 +41,8 @@ const ProfileInfo = () => {
                     )}
                     <div>
                         <div className="text-sm font-medium text-default-800 capitalize ">
-                            {user?.name ?? "Mcc Callem"}
+                            {user?.name ?? "Zen Store"}
                         </div>
-                        <Link
-                            href="/dashboard"
-                            className="text-xs text-default-600 hover:text-primary"
-                        >
-                            @uxuidesigner
-                        </Link>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="mb-0 dark:bg-background" />
@@ -63,7 +51,7 @@ const ProfileInfo = () => {
                     className="flex items-center gap-2 text-sm font-medium text-default-600 capitalize my-1 px-3 dark:hover:bg-background cursor-pointer"
                 >
                     <Icon icon="heroicons:power" className="w-4 h-4" />
-                    Log out
+                    Đăng xuất
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

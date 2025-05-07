@@ -1,14 +1,17 @@
-import { SiteLogo } from "@/components/svg";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSidebar } from "@/store";
-import React from "react";
 
 const SidebarLogo = ({ hovered }: { hovered?: boolean }) => {
     const { sidebarType, setCollapsed, collapsed } = useSidebar();
     return (
-        <div className="px-4 py-4 ">
+        <div className="px-4 py-4 sidebar-logo-height">
             <div className=" flex items-center">
                 <div className="flex flex-1 items-center gap-x-3  ">
-                    <SiteLogo className="text-primary h-8 w-8" />
+                    <Avatar className=" h-8 w-8">
+                        <AvatarImage src={"/images/avatar/logo-admin.jpg"} alt="" />
+                        <AvatarFallback>{"ZN"}</AvatarFallback>
+                    </Avatar>
+
                     {(!collapsed || hovered) && (
                         <div className="flex-1  text-xl text-primary  font-semibold">Zen Store</div>
                     )}
