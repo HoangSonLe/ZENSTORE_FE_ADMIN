@@ -88,9 +88,18 @@ export function DataTable<TData>({
     // Update pagination state when props change
     React.useEffect(() => {
         if (pagination) {
-            setPagination({
-                pageIndex: pagination.pageIndex,
-                pageSize: pagination.pageSize,
+            // Only update if the values are actually different to prevent unnecessary renders
+            setPagination((prev) => {
+                if (
+                    prev.pageIndex === pagination.pageIndex &&
+                    prev.pageSize === pagination.pageSize
+                ) {
+                    return prev; // No change needed
+                }
+                return {
+                    pageIndex: pagination.pageIndex,
+                    pageSize: pagination.pageSize,
+                };
             });
         }
     }, [pagination?.pageIndex, pagination?.pageSize]);
@@ -106,7 +115,8 @@ export function DataTable<TData>({
                     ...column,
                     header: (props: any) => {
                         // Get the original header component
-                        const originalHeader = column.header!(props);
+                        const headerFunc = column.header as Function;
+                        const originalHeader = headerFunc(props);
 
                         // If it's a DataTableColumnHeader component, we need to clone it and add the onSortingToggle prop
                         if (
@@ -130,7 +140,7 @@ export function DataTable<TData>({
 
     const table = useReactTable({
         data,
-        columns: enhancedColumns,
+        columns: enhancedColumns as ColumnDef<TData, any>[],
         state: {
             sorting,
             columnVisibility,
@@ -163,10 +173,11 @@ export function DataTable<TData>({
 
         // Only trigger onPageChange if the change originated from the table UI
         // and not from a prop update
-        if (pagination && currentPageIndex !== pagination.pageIndex) {
-            console.log(
-                `DataTable: Page index changed from ${pagination.pageIndex} to ${currentPageIndex}`
-            );
+        if (
+            pagination &&
+            currentPageIndex !== pagination.pageIndex &&
+            currentPageIndex !== prevPageIndexRef.current
+        ) {
             pagination.onPageChange(currentPageIndex);
         }
 
@@ -175,18 +186,46 @@ export function DataTable<TData>({
     }, [table.getState().pagination.pageIndex, pagination]);
 
     // Handle page size change from server-side pagination
+    const prevPageSizeRef = React.useRef(pagination?.pageSize || 10);
+
     React.useEffect(() => {
-        if (pagination && table.getState().pagination.pageSize !== pagination.pageSize) {
-            pagination.onPageSizeChange(table.getState().pagination.pageSize);
+        const currentPageSize = table.getState().pagination.pageSize;
+
+        // Only trigger onPageSizeChange if the change originated from the table UI
+        // and not from a prop update
+        if (
+            pagination &&
+            currentPageSize !== pagination.pageSize &&
+            currentPageSize !== prevPageSizeRef.current
+        ) {
+            pagination.onPageSizeChange(currentPageSize);
         }
-    }, [table.getState().pagination.pageSize]);
+
+        // Update the ref for the next render
+        prevPageSizeRef.current = currentPageSize;
+    }, [table.getState().pagination.pageSize, pagination]);
 
     // Handle sorting change from server-side sorting
+    const prevSortingRef = React.useRef(JSON.stringify(sortingProps?.initialSorting || []));
+
     React.useEffect(() => {
-        if (sortingProps && table.getState().sorting !== sortingProps.initialSorting) {
-            sortingProps.onSortingChange(table.getState().sorting);
+        const currentSorting = table.getState().sorting;
+        const currentSortingStr = JSON.stringify(currentSorting);
+
+        // Only trigger onSortingChange if the change originated from the table UI
+        // and not from a prop update
+        if (
+            sortingProps &&
+            currentSortingStr !== JSON.stringify(sortingProps.initialSorting) &&
+            currentSortingStr !== prevSortingRef.current
+        ) {
+            console.log(`DataTable: Sorting changed`);
+            sortingProps.onSortingChange(currentSorting);
         }
-    }, [JSON.stringify(table.getState().sorting)]);
+
+        // Update the ref for the next render
+        prevSortingRef.current = currentSortingStr;
+    }, [JSON.stringify(table.getState().sorting), sortingProps]);
 
     return (
         <div className="space-y-4 w-full overflow-hidden">

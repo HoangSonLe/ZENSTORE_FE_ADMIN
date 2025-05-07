@@ -47,7 +47,6 @@ export function setLayoutHeights(): void {
             if (headerElement) {
                 const headerHeight = headerElement.offsetHeight;
                 document.documentElement.style.setProperty("--header-height", `${headerHeight}px`);
-                console.log(`Header height set to ${headerHeight}px`);
             } else {
                 console.warn("Header element not found or has zero height");
             }
@@ -71,7 +70,6 @@ export function setLayoutHeights(): void {
             if (footerElement) {
                 const footerHeight = footerElement.offsetHeight;
                 document.documentElement.style.setProperty("--footer-height", `${footerHeight}px`);
-                console.log(`Footer height set to ${footerHeight}px`);
             } else {
                 console.warn("Footer element not found or has zero height");
             }
