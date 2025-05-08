@@ -1,5 +1,5 @@
 export enum EProductStatus {
-    ALL = 'ALL',
+    ALL = "ALL",
     NEW = "NEW",
     BEST_SELL = "BEST_SELL",
     OUT_STOCK = "OUT_STOCK",
@@ -21,4 +21,9 @@ export enum EBannerOrder {
     ROW_3 = "ROW_3",
     ROW_4 = "ROW_4",
     ROW_5 = "ROW_5",
+}
+
+export enum ETemplateCode {
+    PRODUCT_DETAIL = "PRODUCT_DETAIL",
+    PRODUCT_SHORT_DETAIL = "PRODUCT_SHORT_DETAIL",
 }

@@ -10,6 +10,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import templateApi from "@/apis/template/template.api";
 import { ITemplate, ITemplateQuery } from "@/apis/template/template.interface";
 import { useApi } from "@/hooks/useApi";
+import { ETemplateCode } from "@/constants/enum";
+
+const groupMapping: Record<string, string> = {
+    [ETemplateCode.PRODUCT_DETAIL]: "Mô tả chi tiết",
+    [ETemplateCode.PRODUCT_SHORT_DETAIL]: "Mô tả chi tiết ngắn",
+};
+// Utility function to get display name from template code or ID
+const getTemplateDisplayName = (template: ITemplate): string => {
+    // If you have a mapping of codes to display names, you could use it here
+    // For now, we'll use the code as the display name
+    return groupMapping[template.templateCode] || template.templateCode || template.templateName;
+};
 
 interface InsertTemplateButtonProps {
     className?: string;
@@ -122,7 +134,7 @@ const InsertTemplateButton: React.FC<InsertTemplateButtonProps> = ({
 
             return {
                 id: key,
-                label: representativeTemplate.templateName, // Use templateName as label
+                label: getTemplateDisplayName(representativeTemplate), // Use code instead of name
                 children: group.children,
             };
         });

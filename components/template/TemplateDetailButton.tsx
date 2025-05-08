@@ -11,6 +11,13 @@ import templateApi from "@/apis/template/template.api";
 import { ITemplate, ITemplateQuery } from "@/apis/template/template.interface";
 import { useApi } from "@/hooks/useApi";
 
+// Utility function to get display name from template code or ID
+const getTemplateDisplayName = (template: ITemplate): string => {
+    // If you have a mapping of codes to display names, you could use it here
+    // For now, we'll use the code as the display name
+    return template.templateCode || `Template ${template.templateId}`;
+};
+
 interface TemplateDetailButtonProps {
     className?: string;
     onTemplateSelect?: (template: ITemplate) => void;
@@ -103,7 +110,7 @@ const TemplateDetailButton: React.FC<TemplateDetailButtonProps> = ({
 
             groups[groupKey].children.push({
                 id: template.templateId.toString(),
-                label: template.templateName,
+                label: getTemplateDisplayName(template), // Use code instead of name
                 icon: <FileText className="h-4 w-4" />,
                 templateData: template,
             });
@@ -122,7 +129,7 @@ const TemplateDetailButton: React.FC<TemplateDetailButtonProps> = ({
 
             return {
                 id: key,
-                label: representativeTemplate.templateName, // Use templateName as label
+                label: getTemplateDisplayName(representativeTemplate), // Use code instead of name
                 children: group.children,
             };
         });
@@ -189,7 +196,7 @@ const TemplateDetailButton: React.FC<TemplateDetailButtonProps> = ({
                             <div className="p-4 border-b border-border flex justify-between items-center">
                                 <h3 className="text-lg font-medium">
                                     {selectedTemplate
-                                        ? selectedTemplate.templateName
+                                        ? getTemplateDisplayName(selectedTemplate)
                                         : "Chọn mẫu để xem chi tiết"}
                                 </h3>
                                 {selectedTemplate && onTemplateSelect && (
