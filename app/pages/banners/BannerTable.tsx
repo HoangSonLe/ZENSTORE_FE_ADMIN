@@ -106,6 +106,7 @@ export default function BannerTable() {
             header: ({ column }) => <DataTableColumnHeader column={column} title="Tên" />,
             cell: ({ row }) => renderText(row, "bannerName"),
             size: 200,
+            enableSorting: false,
         },
         {
             accessorKey: "bannerTitle",
@@ -126,12 +127,14 @@ export default function BannerTable() {
             header: ({ column }) => <DataTableColumnHeader column={column} title="Vị trí" />,
             cell: ({ row }) => renderText(row, "bannerTypeName"),
             size: 120,
+            enableSorting: false,
         },
         {
             accessorKey: "updatedAt",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Ngày cập nhật" />,
             cell: ({ row }) => renderDate(row, "updatedAt", "HH:mm DD/MM/YYYY", "right"),
             size: 140,
+            enableSorting: false,
         },
         {
             id: "actions",
@@ -149,6 +152,7 @@ export default function BannerTable() {
                 />
             ),
             size: 100,
+            enableSorting: false,
         },
     ];
 

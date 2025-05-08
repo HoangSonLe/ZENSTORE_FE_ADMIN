@@ -179,6 +179,7 @@ export default function ProductTable() {
             accessorKey: "productName",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Tên sản phẩm" />,
             cell: ({ row }) => renderText(row, "productName"),
+            enableSorting: false,
             size: 200,
         },
         {
@@ -213,12 +214,14 @@ export default function ProductTable() {
                 );
             },
             size: 120,
+            enableSorting: false,
         },
         {
             accessorKey: "productSpaceName",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Dung lượng" />,
             cell: ({ row }) => renderBadge(row, "productSpaceName", "info"),
             size: 120,
+            enableSorting: false,
         },
         {
             accessorKey: "productColorName",
@@ -227,24 +230,28 @@ export default function ProductTable() {
                 return renderText(row, "productColorName");
             },
             size: 120,
+            enableSorting: false,
         },
         {
             accessorKey: "productPriceSale",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Giá" />,
             cell: ({ row }) => renderPrice(row, "productPriceSale", "productPrice"),
             size: 120,
+            enableSorting: false,
         },
         {
             accessorKey: "productSeriesName",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Series" />,
             cell: ({ row }) => renderBadge(row, "productSeriesName", "secondary"),
             size: 120,
+            enableSorting: false,
         },
         {
             accessorKey: "updatedAt",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Cập nhật cuối" />,
             cell: ({ row }) => renderDate(row, "updatedAt", "HH:mm DD/MM/YYYY", "right"),
             size: 140,
+            enableSorting: false,
         },
         {
             id: "actions",
@@ -263,6 +270,7 @@ export default function ProductTable() {
                 />
             ),
             size: 100,
+            enableSorting: false,
         },
     ];
 

@@ -167,12 +167,14 @@ export default function BlogTable() {
                 );
             },
             size: 100,
+            enableSorting: false,
         },
         {
             accessorKey: "updatedAt",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Ngày tạo" />,
             cell: ({ row }) => renderDate(row, "updatedAt", "HH:mm DD/MM/YYYY", "right"),
             size: 140,
+            enableSorting: false,
         },
         {
             id: "actions",
@@ -191,6 +193,7 @@ export default function BlogTable() {
                 />
             ),
             size: 100,
+            enableSorting: false,
         },
     ];
 
